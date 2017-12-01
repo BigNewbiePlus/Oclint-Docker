@@ -1,0 +1,162 @@
+
+SET(BuildTruncationOfConstantValueRule TruncationOfConstantValue)
+BUILD_DYNAMIC_RULES("${BuildTruncationOfConstantValueRule}")
+
+SET(BuildVariableIsAssignedToItselfRule VariableIsAssignedToItself)
+BUILD_DYNAMIC_RULES("${BuildVariableIsAssignedToItselfRule}")
+
+SET(BuildRecurringCheckRule RecurringCheck)
+BUILD_DYNAMIC_RULES("${BuildRecurringCheckRule}")
+
+SET(BuildFunctionReceivesAnOddArgumentRule FunctionReceivesAnOddArgument)
+BUILD_DYNAMIC_RULES("${BuildFunctionReceivesAnOddArgumentRule}")
+
+SET(BuildOddBitwiseOperationRule OddBitwiseOperation)
+BUILD_DYNAMIC_RULES("${BuildOddBitwiseOperationRule}")
+
+SET(BuildIdenticalAlongsideIfConditionRule IdenticalAlongsideIfCondition)
+BUILD_DYNAMIC_RULES("${BuildIdenticalAlongsideIfConditionRule}")
+
+SET(BuildSameReturnValueOfConditionalOperatorRule SameReturnValueOfConditionalOperator)
+BUILD_DYNAMIC_RULES("${BuildSameReturnValueOfConditionalOperatorRule}")
+
+SET(BuildSameValuePresentOnBothSideOfOperatorRule SameValuePresentOnBothSideOfOperator)
+BUILD_DYNAMIC_RULES("${BuildSameValuePresentOnBothSideOfOperatorRule}")
+
+SET(BuildFooFunctionCalledTwiceForDeallocationRule FooFunctionCalledTwiceForDeallocation)
+BUILD_DYNAMIC_RULES("${BuildFooFunctionCalledTwiceForDeallocationRule}")
+
+SET(BuildOddSequenceAssignOfABRule OddSequenceAssignOfAB)
+BUILD_DYNAMIC_RULES("${BuildOddSequenceAssignOfABRule}")
+
+SET(BuildOddOperatorOfEqualPlusRule OddOperatorOfEqualPlus)
+BUILD_DYNAMIC_RULES("${BuildOddOperatorOfEqualPlusRule}")
+
+SET(BuildExcessiveConditionExpressionRule ExcessiveConditionExpression)
+BUILD_DYNAMIC_RULES("${BuildExcessiveConditionExpressionRule}")
+
+SET(BuildNonVoidFunctionShouldReturnAValueRule NonVoidFunctionShouldReturnAValue)
+BUILD_DYNAMIC_RULES("${BuildNonVoidFunctionShouldReturnAValueRule}")
+
+SET(BuildExpressionEnclosedByParenthesesTwiceRule ExpressionEnclosedByParenthesesTwice)
+BUILD_DYNAMIC_RULES("${BuildExpressionEnclosedByParenthesesTwiceRule}")
+
+SET(BuildAssignAndComparisionExpressionErrorRule AssignAndComparisionExpressionError)
+BUILD_DYNAMIC_RULES("${BuildAssignAndComparisionExpressionErrorRule}")
+
+SET(BuildArrayPointerAlwaysNotEqualNULLRule ArrayPointerAlwaysNotEqualNULL)
+BUILD_DYNAMIC_RULES("${BuildArrayPointerAlwaysNotEqualNULLRule}")
+
+SET(BuildUnsignedValueComparedToNegativeNumberRule UnsignedValueComparedToNegativeNumber)
+BUILD_DYNAMIC_RULES("${BuildUnsignedValueComparedToNegativeNumberRule}")
+
+SET(BuildOwnerlessTokenRule OwnerlessToken)
+BUILD_DYNAMIC_RULES("${BuildOwnerlessTokenRule}")
+
+SET(BuildOwnerlessExpressionRule OwnerlessExpression)
+BUILD_DYNAMIC_RULES("${BuildOwnerlessExpressionRule}")
+
+SET(BuildIncompatibleMemoryAllocationAndDeallocationMethodRule IncompatibleMemoryAllocationAndDeallocationMethod)
+BUILD_DYNAMIC_RULES("${BuildIncompatibleMemoryAllocationAndDeallocationMethodRule}")
+
+SET(BuildUnconditionalBreakWithinALoopRule UnconditionalBreakWithinALoop)
+BUILD_DYNAMIC_RULES("${BuildUnconditionalBreakWithinALoopRule}")
+
+SET(BuildBitwiseOperationWithZeroConstantValueRule BitwiseOperationWithZeroConstantValue)
+BUILD_DYNAMIC_RULES("${BuildBitwiseOperationWithZeroConstantValueRule}")
+
+SET(BuildBitwiseOperationWithNonZeroConstantValueRule BitwiseOperationWithNonZeroConstantValue)
+BUILD_DYNAMIC_RULES("${BuildBitwiseOperationWithNonZeroConstantValueRule}")
+
+SET(BuildInitAndFinalForIteratorValueAreSameRule InitAndFinalForIteratorValueAreSame)
+BUILD_DYNAMIC_RULES("${BuildInitAndFinalForIteratorValueAreSameRule}")
+
+SET(BuildMisprintsCommaForSemicolonRule MisprintsCommaForSemicolon)
+BUILD_DYNAMIC_RULES("${BuildMisprintsCommaForSemicolonRule}")
+
+SET(BuildArgumentOfSizeofIsNumberRule ArgumentOfSizeofIsNumber)
+BUILD_DYNAMIC_RULES("${BuildArgumentOfSizeofIsNumberRule}")
+
+SET(BuildAbsolutePathToFileAndDirUsedRule AbsolutePathToFileAndDirUsed)
+BUILD_DYNAMIC_RULES("${BuildAbsolutePathToFileAndDirUsedRule}")
+
+SET(BuildBitShiftOperatorLowPriorityRule BitShiftOperatorLowPriority)
+BUILD_DYNAMIC_RULES("${BuildBitShiftOperatorLowPriorityRule}")
+
+SET(BuildImplicitlyCastFromIntegerToRealTypeRule ImplicitlyCastFromIntegerToRealType)
+BUILD_DYNAMIC_RULES("${BuildImplicitlyCastFromIntegerToRealTypeRule}")
+
+SET(BuildOperationLogicNotCorrespondWithItsFormatRule OperationLogicNotCorrespondWithItsFormat)
+BUILD_DYNAMIC_RULES("${BuildOperationLogicNotCorrespondWithItsFormatRule}")
+
+SET(BuildElseKeywordMissedAccodingToItsFormatRule ElseKeywordMissedAccodingToItsFormat)
+BUILD_DYNAMIC_RULES("${BuildElseKeywordMissedAccodingToItsFormatRule}")
+
+SET(BuildTwoIfStmtWithIdenticalCondtionRule TwoIfStmtWithIdenticalCondtion)
+BUILD_DYNAMIC_RULES("${BuildTwoIfStmtWithIdenticalCondtionRule}")
+
+SET(BuildOperationExecuted3TimesInSuccessionRule OperationExecuted3TimesInSuccession)
+BUILD_DYNAMIC_RULES("${BuildOperationExecuted3TimesInSuccessionRule}")
+
+SET(BuildStringOfTwoPartsUsedForArrayInitializationRule StringOfTwoPartsUsedForArrayInitialization)
+BUILD_DYNAMIC_RULES("${BuildStringOfTwoPartsUsedForArrayInitializationRule}")
+
+SET(BuildConditionOfLoopAlwaysTrueOrFalseRule ConditionOfLoopAlwaysTrueOrFalse)
+BUILD_DYNAMIC_RULES("${BuildConditionOfLoopAlwaysTrueOrFalseRule}")
+
+SET(BuildStringsWereConcatenatedButNotUtilizedRule StringsWereConcatenatedButNotUtilized)
+BUILD_DYNAMIC_RULES("${BuildStringsWereConcatenatedButNotUtilizedRule}")
+
+SET(BuildVariablesInitializedThroughSameFunctionCallRule VariablesInitializedThroughSameFunctionCall)
+BUILD_DYNAMIC_RULES("${BuildVariablesInitializedThroughSameFunctionCallRule}")
+
+SET(BuildIteratorInitAndFinalValueDifferInForLoopRule IteratorInitAndFinalValueDifferInForLoop)
+BUILD_DYNAMIC_RULES("${BuildIteratorInitAndFinalValueDifferInForLoopRule}")
+
+SET(BuildNoSenseTestPointerAgainstNullAsMemAlloUseNewRule NoSenseTestPointerAgainstNullAsMemAlloUseNew)
+BUILD_DYNAMIC_RULES("${BuildNoSenseTestPointerAgainstNullAsMemAlloUseNewRule}")
+
+SET(BuildSuspiciousMixOfIntegerAndRealExpressionRule SuspiciousMixOfIntegerAndRealExpression)
+BUILD_DYNAMIC_RULES("${BuildSuspiciousMixOfIntegerAndRealExpressionRule}")
+
+SET(BuildPatternAOrAExpressionIsExecessiveRule PatternAOrAExpressionIsExecessive)
+BUILD_DYNAMIC_RULES("${BuildPatternAOrAExpressionIsExecessiveRule}")
+
+SET(BuildPointerPlusConstantConditionIsFalseRule PointerPlusConstantConditionIsFalse)
+BUILD_DYNAMIC_RULES("${BuildPointerPlusConstantConditionIsFalseRule}")
+
+SET(BuildRangeIntersectionAreWithinConditionExpressionRule RangeIntersectionAreWithinConditionExpression)
+BUILD_DYNAMIC_RULES("${BuildRangeIntersectionAreWithinConditionExpressionRule}")
+
+SET(BuildContinueWillTerminateDoWhileFalseLoopRule ContinueWillTerminateDoWhileFalseLoop)
+BUILD_DYNAMIC_RULES("${BuildContinueWillTerminateDoWhileFalseLoopRule}")
+
+SET(BuildVariableInitializedThroughItselfRule VariableInitializedThroughItself)
+BUILD_DYNAMIC_RULES("${BuildVariableInitializedThroughItselfRule}")
+
+SET(BuildCompareThisWithNULLShouldBeAvoidRule CompareThisWithNULLShouldBeAvoid)
+BUILD_DYNAMIC_RULES("${BuildCompareThisWithNULLShouldBeAvoidRule}")
+
+SET(BuildElseBlockWasPossibleForgottenOrCommentOutRule ElseBlockWasPossibleForgottenOrCommentOut)
+BUILD_DYNAMIC_RULES("${BuildElseBlockWasPossibleForgottenOrCommentOutRule}")
+
+SET(BuildSuspiciousComparisionPatternWithAEqualBEqualCRule SuspiciousComparisionPatternWithAEqualBEqualC)
+BUILD_DYNAMIC_RULES("${BuildSuspiciousComparisionPatternWithAEqualBEqualCRule}")
+
+SET(BuildCreateSameLocalVariableAsControlVariableWithinLoopRule CreateSameLocalVariableAsControlVariableWithinLoop)
+BUILD_DYNAMIC_RULES("${BuildCreateSameLocalVariableAsControlVariableWithinLoopRule}")
+
+SET(BuildFreeArrayMemoryRule FreeArrayMemory)
+BUILD_DYNAMIC_RULES("${BuildFreeArrayMemoryRule}")
+
+SET(BuildUnaryMinusCanntModifyBoolValueRule UnaryMinusCanntModifyBoolValue)
+BUILD_DYNAMIC_RULES("${BuildUnaryMinusCanntModifyBoolValueRule}")
+
+SET(BuildMacroExpansionResultIncorrectOrderRule MacroExpansionResultIncorrectOrder)
+BUILD_DYNAMIC_RULES("${BuildMacroExpansionResultIncorrectOrderRule}")
+
+SET(BuildCommaMissingInIntArrayInitRule CommaMissingInIntArrayInit)
+BUILD_DYNAMIC_RULES("${BuildCommaMissingInIntArrayInitRule}")
+
+SET(BuildSuspiciousCompoundAssignmentExpressionRule SuspiciousCompoundAssignmentExpression)
+BUILD_DYNAMIC_RULES("${BuildSuspiciousCompoundAssignmentExpressionRule}")
