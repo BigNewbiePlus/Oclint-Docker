@@ -13,23 +13,40 @@ TEST(StringsWereConcatenatedButNotUtilizedRuleTest, PropertyTest)
 TEST(StringsWereConcatenatedButNotUtilizedRuleTest, NoViolationInstance)
 {
     testRuleOnCXXCode(new StringsWereConcatenatedButNotUtilizedRule(), 
-            "void m(){string a;while(a.size()){a+=\"((\";}}");
+            "#include<string>\n"
+            "using namespace std;"
+            "void m(){string a;while(a.size()){a+=\"skdljsld\";}}");
     testRuleOnCXXCode(new StringsWereConcatenatedButNotUtilizedRule(),
-            "void m(){string a,b;a=a+\"*****\";}");
+            "#include<string>\n"
+            "using namespace std;"
+            "void m(){string a,b;a=a+\"*****\";a+=b;}");
 }
 
 TEST(StringsWereConcatenatedButNotUtilizedRuleTest, test1)
 {
          
     testRuleOnCXXCode(new StringsWereConcatenatedButNotUtilizedRule(), 
-            "void m(){string a;\na+\"(\";"
-            "}",0, 3, 1, 3, 5, "The strings were concatenated but are not utilized. Consider inspecting the expression.");
+            "#include<string>\n"
+            "using namespace std;"
+            "void m(){string a;\na+\"bigcat\";"
+            "}",0, 3, 1, 3, 3, "The strings were concatenated but are not utilized. Consider inspecting the expression.");
 }
 
 TEST(StringsWereConcatenatedButNotUtilizedRuleTest, test2)
 {
          
     testRuleOnCXXCode(new StringsWereConcatenatedButNotUtilizedRule(), 
+            "#include<string>\n"
+            "using namespace std;"
             "void m(){string a,b;\nwhile(a.size()){\na+\"12\"+b+\"2323\";}"
-            "}",0, 3, 1, 3, 13, "The strings were concatenated but are not utilized. Consider inspecting the expression.");
+            "}",0, 4, 1, 4, 10, "The strings were concatenated but are not utilized. Consider inspecting the expression.");
+}
+TEST(StringsWereConcatenatedButNotUtilizedRuleTest, test3)
+{
+         
+    testRuleOnCXXCode(new StringsWereConcatenatedButNotUtilizedRule(), 
+            "#include<string>\n"
+            "using namespace std;"
+            "void m(){string a,b;\nif(a.size()){\na+b;}"
+            "}",0, 4, 1, 4, 3, "The strings were concatenated but are not utilized. Consider inspecting the expression.");
 }

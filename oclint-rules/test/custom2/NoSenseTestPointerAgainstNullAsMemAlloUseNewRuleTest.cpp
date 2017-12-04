@@ -1,8 +1,5 @@
 #include "TestRuleOnCode.h"
 #include "rules/custom2/NoSenseTestPointerAgainstNullAsMemAlloUseNewRule.cpp"
-#include<cstddef>
-#include<stdlib.h>
-#include<stdio.h>
 
 TEST(NoSenseTestPointerAgainstNullAsMemAlloUseNewRuleTest, PropertyTest)
 {
@@ -23,7 +20,7 @@ TEST(NoSenseTestPointerAgainstNullAsMemAlloUseNewRuleTest, Test1)
 {
          
     testRuleOnCXXCode(new NoSenseTestPointerAgainstNullAsMemAlloUseNewRule(), 
-            "\n"
+            "#include<cstddef>\n"
             "void m(){\n"
             "int *a=new int[10];\nif(a){}}",0, 4, 1, 4, 7, "There is no sense in testing the 'a' pointer against null, as the memory was allocated using the 'new' operator. The exception will be generated in the case of memory allocation error.");
 }
@@ -32,7 +29,7 @@ TEST(NoSenseTestPointerAgainstNullAsMemAlloUseNewRuleTest, Test2)
 {
          
     testRuleOnCXXCode(new NoSenseTestPointerAgainstNullAsMemAlloUseNewRule(), 
-            "\n"
+            "#include<cstddef>\n"
             "void m(){\n"
             "int *a; a=new int[10];\nif(a){}}",0, 4, 1, 4, 7, "There is no sense in testing the 'a' pointer against null, as the memory was allocated using the 'new' operator. The exception will be generated in the case of memory allocation error.");
 }
@@ -40,8 +37,8 @@ TEST(NoSenseTestPointerAgainstNullAsMemAlloUseNewRuleTest, Test3)
 {
          
     testRuleOnCXXCode(new NoSenseTestPointerAgainstNullAsMemAlloUseNewRule(), 
-            "\n"
+            "#include<cstddef>\n"
             "class person{};"
             "void m(){\n"
-            "person* lily = new person();\nif(person!=NULL){}}",0, 4, 1, 4, 15,"There is no sense in testing the 'lily' pointer against null, as the memory was allocated using the 'new' operator. The exception will be generated in the case of memory allocation error.");
+            "person* lily = new person();\nif(lily==NULL){}}",0, 4, 1, 4, 16,"There is no sense in testing the 'lily' pointer against null, as the memory was allocated using the 'new' operator. The exception will be generated in the case of memory allocation error.");
 }

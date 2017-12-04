@@ -85,7 +85,7 @@ public:
         string funName = callExpr->getDirectCallee()->getNameInfo().getAsString();
         if(funName=="fopen"){
             Expr* expr = callExpr->getArg(0);
-            if(isa<ImplicitCastExpr>(expr)){
+            while(isa<ImplicitCastExpr>(expr)){
                 ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
                 expr = ice->getSubExpr();
             }
@@ -100,6 +100,7 @@ public:
         }
         return true;
     }
+
 };
 
 static RuleSet rules(new AbsolutePathToFileAndDirUsedRule());

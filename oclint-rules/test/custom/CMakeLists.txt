@@ -148,5 +148,3 @@
 #BUILD_TEST(ArgumentOfSizeofIsExpressionRuleTest
 #ArgumentOfSizeofIsExpressionRuleTest.cpp)
 
-BUILD_TEST(NULLCheckRuleTest
-NULLCheckRuleTest.cpp)

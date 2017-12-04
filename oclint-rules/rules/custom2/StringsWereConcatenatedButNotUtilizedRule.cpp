@@ -79,35 +79,36 @@ public:
     virtual void setUp() override {}
     virtual void tearDown() override {}
 
-    bool isStringDeclRefExpr(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
-            ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
-            expr = ice->getSubExpr();
-        }
-        if(isa<DeclRefExpr>(expr)){
-            DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(expr);
-            return dre->getType().getAsString()=="string";
-        }
-    }
-    /* Visit ExprWithCleanups */
-    bool VisitExprWithCleanups(ExprWithCleanups *ewc)
-    {
+    bool isConcateOperator(ExprWithCleanups* ewc){
         Expr* expr = ewc->getSubExpr();
         if(isa<CXXBindTemporaryExpr>(expr)){
             CXXBindTemporaryExpr* cbte = dyn_cast_or_null<CXXBindTemporaryExpr>(expr);
             expr = cbte->getSubExpr();
-            if(isa<CXXOperatorCallExpr>(expr)){
-                CXXOperatorCallExpr* cce = dyn_cast_or_null<CXXOperatorCallExpr>(expr);
-                if(!cce->isAssignmentOp() && cce->getNumArgs()>0 && cce->getDirectCallee()->getNameInfo().getAsString()=="+" ){
-                    if(isStringDeclRefExpr(cce->getArg(0))){
-                        string message= "The strings were concatenated but are not utilized. Consider inspecting the expression.";
-                        addViolation(ewc, this, message);
-                    }
+        }
+        if(isa<CXXOperatorCallExpr>(expr)){
+            CXXOperatorCallExpr* cxxCallExpr = dyn_cast_or_null<CXXOperatorCallExpr>(expr);
+            string operType = cxxCallExpr->getDirectCallee()->getNameInfo().getAsString();
+            if(operType=="operator+")return true;
+        }
+        return false;
+    }
+    /* Visit CompoundStmt */
+    bool VisitCompoundStmt(CompoundStmt *cs)
+    {
+        for(CompoundStmt::body_iterator it=cs->body_begin();it!=cs->body_end(); it++){
+            if(isa<ExprWithCleanups>(*it)){
+                ExprWithCleanups* ewc = dyn_cast_or_null<ExprWithCleanups>(*it);
+                string type = ewc->getType().getAsString();
+                string strType = "basic_string<char, struct std::char_traits<char>, class std::allocator<char> >";
+                if(type==strType && isConcateOperator(ewc)){//string类型
+                    string message = "The strings were concatenated but are not utilized. Consider inspecting the expression.";
+                    addViolation(*it, this, message);
                 }
             }
         }
         return true;
     }
+
 };
 
 static RuleSet rules(new StringsWereConcatenatedButNotUtilizedRule());

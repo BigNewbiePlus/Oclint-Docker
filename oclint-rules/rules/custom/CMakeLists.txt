@@ -148,5 +148,3 @@ BUILD_DYNAMIC_RULES("${BuildEmptyExceptionHandlerRule}")
 SET(BuildArgumentOfSizeofIsExpressionRule ArgumentOfSizeofIsExpression)
 BUILD_DYNAMIC_RULES("${BuildArgumentOfSizeofIsExpressionRule}")
 
-SET(BuildNULLCheckRule NULLCheck)
-BUILD_DYNAMIC_RULES("${BuildNULLCheckRule}")

@@ -1,6 +1,6 @@
 #include "TestRuleOnCode.h"
 #include <gmock/gmock.h>
-
+#include<fstream>
 using namespace ::testing;
 
 #include <clang/Tooling/Tooling.h>
@@ -8,7 +8,6 @@ using namespace ::testing;
 using namespace llvm;
 using namespace clang;
 using namespace clang::tooling;
-
 #include "oclint/RuleBase.h"
 #include "TestEngine.h"
 
@@ -91,7 +90,7 @@ void testRuleOnCode(RuleBase *rule,
     int expectEndColumn,
     const string& expectMessage)
 {
-    testRuleOnCode("input.c", rule, code, {}, violationIndex,
+    testRuleOnCode("input.c", rule, code, {"-I/usr/src/app/oclint/build/llvm-install/lib/clang/5.0.0/include"}, violationIndex,
         expectStartLine, expectStartColumn, expectEndLine, expectEndColumn, expectMessage);
 }
 
@@ -104,7 +103,7 @@ void testRuleOnCXXCode(RuleBase *rule,
     int expectEndColumn,
     const string& expectMessage)
 {
-    testRuleOnCode("input.cpp", rule, code, {}, violationIndex,
+    testRuleOnCode("input.cpp", rule, code, {"-I/usr/src/app/oclint/build/llvm-install/lib/clang/5.0.0/include"}, violationIndex,
         expectStartLine, expectStartColumn, expectEndLine, expectEndColumn, expectMessage);
 }
 
@@ -233,19 +232,19 @@ void testRuleOnCode(const Twine& filename,
 void testRuleOnCode(RuleBase* rule, std::string code,
     const std::vector<std::string>& messages)
 {
-    testRuleOnCode("input.c", {}, rule, code, messages);
+    testRuleOnCode("input.c", {"-I/usr/src/app/oclint/build/llvm-install/lib/clang/5.0.0/include"}, rule, code, messages);
 }
 
 void testRuleOnCXXCode(RuleBase* rule, std::string code,
     const std::vector<std::string>& messages)
 {
-    testRuleOnCode("input.cpp", {}, rule, code, messages);
+    testRuleOnCode("input.cpp", {"-I/usr/src/app/oclint/build/llvm-install/lib/clang/5.0.0/include"}, rule, code, messages);
 }
 
 void testRuleOnCXX11Code(RuleBase* rule, std::string code,
     const std::vector<std::string>& messages)
 {
-    testRuleOnCode("input.cpp", {"-std=c++11"}, rule, code, messages);
+    testRuleOnCode("input.cpp", {"-std=c++11","-I/usr/src/app/oclint/build/llvm-install/lib/clang/5.0.0/include"}, rule, code, messages);
 }
 
 void testRuleOnObjCCode(RuleBase* rule, std::string code,

@@ -1,6 +1,5 @@
 #include "TestRuleOnCode.h"
 #include "rules/custom2/AbsolutePathToFileAndDirUsedRule.cpp"
-#include<stdio.h>
 
 TEST(AbsolutePathToFileAndDirUsedRuleTest, PropertyTest)
 {
@@ -12,15 +11,17 @@ TEST(AbsolutePathToFileAndDirUsedRuleTest, PropertyTest)
 
 TEST(AbsolutePathToFileAndDirUsedRuleTest, NoViolationInstance)
 {
-    testRuleOnCXXCode(new AbsolutePathToFileAndDirUsedRule(), 
+    testRuleOnCode(new AbsolutePathToFileAndDirUsedRule(), 
+            "#include<stdio.h>\n"
             "void m(){int a,b;FILE* fp = fopen(\"./test.cpp\", \"w\");}");
 }
 
 TEST(AbsolutePathToFileAndDirUsedRuleTest, Test1)
 {
          
-    testRuleOnCXXCode(new AbsolutePathToFileAndDirUsedRule(), 
+    testRuleOnCode(new AbsolutePathToFileAndDirUsedRule(), 
+            "#include<stdio.h>\n"
             "void m(){\n"
-            "int a;FILE* fp=\nfopen(\"c://myfile/file.dat\", \"r+\");}",0, 4, 1, 4, 10, "Consider inspecting the 'fopen' function call. Defining an absolute path to the file or directory is considered a poor style.");
+            "int a;FILE* fp=\nfopen(\"c://myfile/file.dat\", \"r+\");}",0, 4, 1, 4, 34, "Consider inspecting the 'fopen' function call. Defining an absolute path to the file or directory is considered a poor style.");
 }
 

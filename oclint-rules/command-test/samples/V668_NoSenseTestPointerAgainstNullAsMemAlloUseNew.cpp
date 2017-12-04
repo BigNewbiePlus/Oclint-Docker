@@ -11,5 +11,6 @@ int main()
     if(ptr!=NULL){}
 
     person* lily = new person();
+    if(lily==NULL){}
     return 0;
 }
