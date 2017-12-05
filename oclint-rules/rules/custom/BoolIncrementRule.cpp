@@ -1,6 +1,5 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
-#include "clang/Lex/Lexer.h"
     
 using namespace std;
 using namespace clang;
@@ -78,37 +77,23 @@ public:
 #endif
 
     virtual void setUp() override {
-        sm = &_carrier->getSourceManager();
     }
     virtual void tearDown() override {}
 
     /* Visit UnaryOperator */
     bool VisitUnaryOperator(UnaryOperator *node)
     {
-        if(node->getOpcode()==UO_PostInc || node->getOpcode()==UO_PreInc){
+        if(node->getOpcode()==UO_PostInc){
             Expr* expr = node->getSubExpr();
-            if(expr->getType()->isBooleanType()){
-                string exprStr = expr2str(node);
-                string message = "A bool type variable is being incremented: "+exprStr+
-                    ". Perhaps another variable should be incremented instead.";
+            if(expr->getType()->isBooleanType() && isa<DeclRefExpr>(expr)){
+                DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(expr);
+                string declName = dre->getNameInfo().getAsString();
+                string message = "A bool type variable is being incremented: "+declName+"++. Perhaps another variable should be incremented instead.";
                 addViolation(node, this, message);
             }
         }
         return true;
     }
-private:    
-    std::string expr2str(Expr *expr) {
-        // (T, U) => "T,,"
-        string text = clang::Lexer::getSourceText(
-            CharSourceRange::getTokenRange(expr->getSourceRange()), *sm, LangOptions(), 0);
-        if (text.at(text.size()-1) == ',')
-            return clang::Lexer::getSourceText(CharSourceRange::getCharRange(expr->getSourceRange()), *sm, LangOptions(), 0);
-        return text;
-    } 
-    
-private:
-    SourceManager* sm;
-     
 };
 
 static RuleSet rules(new BoolIncrementRule());  

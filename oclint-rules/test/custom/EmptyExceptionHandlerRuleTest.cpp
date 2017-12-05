@@ -13,19 +13,15 @@ TEST(EmptyExceptionHandlerRuleTest, NoViolationInstance)
 {
     
     testRuleOnCXXCode(new EmptyExceptionHandlerRule(), 
-                  "#include<iostream>\n"
                    "#include<exception>\n"
-                   "using namespace std;\n"    
-                   "void foo(){try{}catch(std::exception &e){cout<<\"hello world\";}}");
+                   "void foo(){try{}catch(std::exception &e){int a=0;}}");
 }
 
 TEST(EmptyExceptionHandlerRuleTest, Test1)
 {
          
     testRuleOnCXXCode(new EmptyExceptionHandlerRule(),                     
-                      "#include<iostream>\n"
                    "#include<exception>\n"
-                   "using namespace std;\n"    
                    "void foo(){try{}\ncatch(std::exception &e){}}",
-            0, 5, 1, 5, 26, "An empty exception handler. Silent suppression of exceptions can hide the presence of bugs in source code during testing.");
+            0, 3, 1, 3, 26, "An empty exception handler. Silent suppression of exceptions can hide the presence of bugs in source code during testing.");
 }

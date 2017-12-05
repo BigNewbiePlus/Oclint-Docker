@@ -10,17 +10,20 @@ TEST(BoolIncrementRuleTest, PropertyTest)
 }
 TEST(BoolIncrementRuleTest, NoViolationInstance)    
 {
-    
     testRuleOnCXXCode(new BoolIncrementRule(), 
-                      "#include<iostream>\n"
                       "void m(){bool a=false; if(a){}}");
 }
 
 TEST(BoolIncrementRuleTest, Test1)
 {
-         
     testRuleOnCXXCode(new BoolIncrementRule(), 
-                   "#include<iostream>\n"
-                      "void m(){bool a=false; if(\na++){}}",
-            0, 3, 1, 3, 2, "A bool type variable is being incremented: a++. Perhaps another variable should be incremented instead.");
+            "void m(){bool a=false; if(\na++){}}",
+            0, 2, 1, 2, 2, "A bool type variable is being incremented: a++. Perhaps another variable should be incremented instead.");
+}
+
+TEST(BoolIncrementRuleTest, Test2)
+{
+    testRuleOnCXXCode(new BoolIncrementRule(), 
+            "void m(){bool a=false; if(a){\na++;}}",
+            0, 2, 1, 2, 2, "A bool type variable is being incremented: a++. Perhaps another variable should be incremented instead.");
 }

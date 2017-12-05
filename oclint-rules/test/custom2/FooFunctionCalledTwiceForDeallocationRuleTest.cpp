@@ -13,12 +13,10 @@ TEST(FooFunctionCalledTwiceForDeallocationRuleTest, NoViolationInstance)
 {
     testRuleOnCXXCode(new FooFunctionCalledTwiceForDeallocationRule(),
             "#include<vector>\n"
-            "using namespace std;\n"
-            "void m(){vector<int> a; a.clear();}");
+            "void m(){std::vector<int> a; a.clear();}");
     testRuleOnCXXCode(new FooFunctionCalledTwiceForDeallocationRule(), 
             "#include<vector>\n"
-            "using namespace std;\n"
-            "void m(){vector<int> a, b; a.clear();b.clear();}");
+            "void m(){std::vector<int> a, b; a.clear();b.clear();}");
 }
 
 TEST(FooFunctionCalledTwiceForDeallocationRuleTest, Test1)
@@ -26,8 +24,7 @@ TEST(FooFunctionCalledTwiceForDeallocationRuleTest, Test1)
          
     testRuleOnCXXCode(new FooFunctionCalledTwiceForDeallocationRule(), 
             "#include<vector>\n"
-            "using namespace std;\n"
-            "void m(){vector<int> a, b; a.clear();\na.clear();}"
-           ,0, 4, 1, 4, 9, "The 'clear' function is called twice for deallocation of the same resource.");
+            "void m(){std::vector<int> a, b; a.clear();\na.clear();}"
+           ,0, 3, 1, 3, 9, "The 'clear' function is called twice for deallocation of the same resource.");
 }
 

@@ -97,9 +97,6 @@ BUILD_DYNAMIC_RULES("${BuildSameVariableUseInForLoopRule}")
 SET(BuildConstantValueWithZeroPrefixRule ConstantValueWithZeroPrefix)
 BUILD_DYNAMIC_RULES("${BuildConstantValueWithZeroPrefixRule}")
 
-SET(BuildIteratorsAsArgumentRule IteratorsAsArgument)
-BUILD_DYNAMIC_RULES("${BuildIteratorsAsArgumentRule}")
-
 SET(BuildFormatStringIntoItselfInSprintfRule FormatStringIntoItselfInSprintf)
 BUILD_DYNAMIC_RULES("${BuildFormatStringIntoItselfInSprintfRule}")
 

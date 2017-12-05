@@ -22,7 +22,7 @@ TEST(TwoFunctionBodyEquivalentRuleTest, Test1)
 {
          
     testRuleOnCode(new TwoFunctionBodyEquivalentRule(),                                           
-                   "void m(){\nfor(int i=0;i<10;i++){}\n}\n"
-                   "\nvoid m1(){\nfor(int i=0;i<10;i++){}\n}\n\n\n",
-            0, 1, 1, 3, 1, "It is odd that the body of 'm' function is fully equivalent to the body of 'm1' function.");
+                   "void foo(){for(int i=0;i<10;i++){}}"
+                   "\nvoid test(){for(int i=0;i<10;i++){}}",
+            0, 2, 1, 2, 36, "It is odd that the body of 'foo' function is fully equivalent to the body of 'test' function.");
 }

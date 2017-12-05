@@ -24,3 +24,11 @@ TEST(ThenAndElseBodyEquivalentRuleTest, Test1)
                       "void m(){int a,b,c; int flag; \nif(flag){a=b+c;}else{a=b+c;}}",
             0, 2, 1, 2, 28, "The 'then' statement is equivalent to the 'else' statement.");
 }
+TEST(ThenAndElseBodyEquivalentRuleTest, Test2)
+{
+         
+    testRuleOnCode(new ThenAndElseBodyEquivalentRule(),                     
+                      
+                      "void m(){int a,b,c; int flag; \nif(flag){a=b+c;flag=2;}else{a=b+c;flag=2;}}",
+            0, 2, 1, 2, 42, "The 'then' statement is equivalent to the 'else' statement.");
+}

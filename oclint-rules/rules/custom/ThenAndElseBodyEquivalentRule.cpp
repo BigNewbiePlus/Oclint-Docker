@@ -84,43 +84,15 @@ public:
     /* Visit IfStmt */
     bool VisitIfStmt(IfStmt *ifStmt)
     {
-        vector<string> bodys = getThenElseBodys(ifStmt);
-        
-        for(int i=0;i<bodys.size()-1;i++)
-            for(int j=i+1;j<bodys.size();j++){
-       
-            if(bodys[i]==bodys[j]){
+        if(ifStmt->getElse()){
+            Stmt* then = ifStmt->getThen();
+            Stmt* els  = ifStmt->getElse();
+            if(stmt2str(then)==stmt2str(els)){
                 addViolation(ifStmt, this, "The 'then' statement is equivalent to the 'else' statement.");
-                return true;
             }
         }
         
         return true;
-    }
-private:
-    vector<string> getThenElseBodys(IfStmt* ifStmt){
-      
-        vector<string> bodys;
-        if(!ifStmt->getElse())return bodys;
-        
-        Stmt* thenStmt;
-        Stmt* elseStmt;
-        while(true){
-            thenStmt = ifStmt->getThen();
-            bodys.push_back(stmt2str(thenStmt));
-            
-            elseStmt = ifStmt->getElse();
-            if(!elseStmt)break;
-            
-            if(isa<IfStmt>(elseStmt)){
-                ifStmt = dyn_cast<IfStmt>(elseStmt);    
-            }else{
-                bodys.push_back(stmt2str(elseStmt));
-                break;    
-            }
-           
-        }
-        return bodys;
     }
     
     std::string stmt2str(Stmt *stmt) {

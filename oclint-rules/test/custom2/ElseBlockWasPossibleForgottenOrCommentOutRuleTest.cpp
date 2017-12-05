@@ -9,7 +9,16 @@ TEST(ElseBlockWasPossibleForgottenOrCommentOutRuleTest, PropertyTest)
     EXPECT_EQ("custom2", rule.category());
 }
 
-TEST(ElseBlockWasPossibleForgottenOrCommentOutRuleTest, FirstFailingTest)
+TEST(ElseBlockWasPossibleForgottenOrCommentOutRuleTest, NoViolationInstance)
 {
-    EXPECT_FALSE("Start writing a new test");
+    testRuleOnCXXCode(new ElseBlockWasPossibleForgottenOrCommentOutRule(),
+            "void m(){int a;if(a>0){}else{}}");
+}
+
+TEST(ElseBlockWasPossibleForgottenOrCommentOutRuleTest, Test1)
+{
+         
+    testRuleOnCXXCode(new ElseBlockWasPossibleForgottenOrCommentOutRule(), 
+            "void m(){"
+            "int a,b; \nif(a>0)\n{}else\n\nif(b>0){}}",0, 2, 1, 5, 9, "It is possible that 'else' block was forgotten or commented out, thus altering the program's operation logics.");
 }

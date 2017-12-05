@@ -1,7 +1,5 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
-#include "clang/Lex/Lexer.h"
-#include<fstream>
 using namespace std;
 using namespace clang;
 using namespace oclint;
@@ -85,9 +83,6 @@ public:
 #endif
 
     virtual void setUp() override {
-        sm = &_carrier->getSourceManager();
-        astContext = _carrier->getASTContext();
-        
     }
     virtual void tearDown() override {
         
@@ -101,40 +96,27 @@ public:
             BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(cond);
             Expr* lhs = binaryOperator->getLHS();
             Expr* rhs = binaryOperator->getRHS();
-            clang::BinaryOperatorKind bok = binaryOperator->getOpcode();
-            
-            if(bok!=BO_LAnd && bok!=BO_LOr)return true;
-            
-            PointerState ps1 = getLPointerState(lhs);
-            PointerState ps2 = getRPointerState(rhs);
-            bool violation=false;
-            if(ps1.isPointer && ps2.isPointer && ps1.name==ps2.name){
-                if(bok==BO_LAnd && ps1.isNull && ps2.deref)violation=true;
-                else if(bok==BO_LOr && !ps1.isNull && ps2.deref)violation=true;
+            BinaryOperatorKind bok = binaryOperator->getOpcode();
+           
+            if(bok==BO_LAnd || bok==BO_LOr){
+                PointerState ps1 = getLPointerState(lhs);
+                if(!ps1.isPointer)return true;
+                PointerState ps2 = getRPointerState(rhs);
+                if(ps1.isPointer && ps2.isPointer && ps2.deref && ps1.name==ps2.name){
+                    bool violation=false;
+                    if(bok==BO_LAnd && ps1.isNull)violation=true;
+                    else if(bok==BO_LOr && !ps1.isNull)violation=true;
+                    if(violation){
+                        string message = "Dereferencing of the null pointer '"+ps1.name+"' might take place. Check the logical condition.";
+                        addViolation(cond,this, message);
+                    }           
+                }
+                
             }
-            if(violation){
-                string message = "Dereferencing of the null pointer '"+ps1.name+"' might take place. Check the logical condition.";
-                addViolation(cond,this, message);
-            }           
         }
         return true;
     }
     
-    /* Visit DeclRefExpr */
-    bool VisitDeclRefExpr(DeclRefExpr *node)
-    {
-        ValueDecl* valueDecl = node->getDecl();
-        if(valueDecl->getType()->isPointerType()){//指针
-            string name = valueDecl->getNameAsString();
-            if(isRefNullInIfCondition(*node, name)){
-                
-                string nodeStr = expr2str(node);
-                string message = "Dereferencing of the null pointer '"+nodeStr+"' might take place. Check the logical condition.";
-                addViolation(node, this, message);
-            }
-        }
-        return true;
-    }
     
 private:
     /*********************************************getLPointerState***********************************************************/
@@ -146,7 +128,7 @@ private:
                 expr = implicitCastExpr->getSubExpr();
             }else if(isa<IntegerLiteral>(expr)){
                 auto integerLiteral = dyn_cast_or_null<IntegerLiteral>(expr);
-                if(integerLiteral->getValue()==0)type=0;
+                if(integerLiteral->getValue().getSExtValue()==0)type=0;
                 break;
             }else if(isa<DeclRefExpr>(expr)){
                 auto declRefExpr = dyn_cast_or_null<DeclRefExpr>(expr);
@@ -161,19 +143,19 @@ private:
                 break;
         }
     }
-    PointerState getLPointerState(const Expr* expr){
+    PointerState getLPointerState(Expr* expr){
         PointerState ps;
         ps.isPointer=false;
         
         bool unary = false;
         
         if(isa<BinaryOperator>(expr)){
-            auto binaryOperator = dyn_cast_or_null<BinaryOperator>(expr);
-            auto bok = binaryOperator->getOpcode();
+            BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(expr);
+            BinaryOperatorKind bok = bo->getOpcode();
             if(bok!=BO_EQ && bok!=BO_NE)return ps;
             
-            auto lhs = binaryOperator->getLHS();
-            auto rhs = binaryOperator->getRHS();
+            Expr* lhs = bo->getLHS();
+            Expr* rhs = bo->getRHS();
             
             int ltype, rtype;
             string lname, rname;
@@ -247,84 +229,6 @@ private:
         }
         return ps;
     }
-    
-    /********************************************* isRefNullInIfCondition ***********************************************************/
-    bool isRefNullInIfCondition(const clang::Stmt& stmt, string name){
-        
-        bool deref = false;
-        const Stmt *parent = NULL;
-        const Stmt *child = &stmt;
-        while(true){//找到第一个父ifStmt
-            auto it = astContext->getParents(*child).begin();
-            if(it == astContext->getParents(*child).end())
-                return false;
-        
-            parent = it->get<clang::Stmt>();
-            if(parent){
-                if(isa<UnaryOperator>(parent)){
-                    
-                    
-                    auto unaryOperator = dyn_cast<UnaryOperator>(parent);
-                    if(unaryOperator->getOpcode()==UO_Deref){
-                        deref = true;
-                    }
-                }else if(isa<IfStmt>(parent)){
-                    break;
-                }
-            }else
-                break;
-            child = parent;
-        }
-        
-        if(deref && parent && isa<IfStmt>(parent)){
-            
-            auto ifStmt = dyn_cast<IfStmt>(parent);
-            
-            if(ifStmt->getThen()==child){//child是否是if语句的then部分
-
-                PointerState ps= getLPointerState(ifStmt->getCond());
-                if(ps.isPointer && ps.isNull && ps.name == name){
-                    return true;
-                }
-            }else{//从else跳出
-
-                while(isa<IfStmt>(parent)){
-                    
-                    auto ifStmt = dyn_cast<IfStmt>(parent);
-                    PointerState ps1= getLPointerState(ifStmt->getCond());
-                    if(ps1.isPointer && !ps1.isNull && ps1.name == name){
-                        return true;
-                    }
-                    auto it = astContext->getParents(*parent).begin();
-                    if(it == astContext->getParents(*parent).end())
-                        break;
-                    parent = it->get<clang::Stmt>();
-                }
-                
-            }
-                
-        }
-        return false;
-           
-    }
-    std::string expr2str(Expr *expr) {
-        // (T, U) => "T,,"
-        string text = clang::Lexer::getSourceText(CharSourceRange::getTokenRange(expr->getSourceRange()), *sm, LangOptions(), 0);
-        if (text.at(text.size()-1) == ',')
-            return clang::Lexer::getSourceText(CharSourceRange::getCharRange(expr->getSourceRange()), *sm, LangOptions(), 0);
-        return text;
-    }
-    std::string stmt2str(const Stmt *stmt) {
-        // (T, U) => "T,,"
-        string text = clang::Lexer::getSourceText(CharSourceRange::getTokenRange(stmt->getSourceRange()), *sm, LangOptions(), 0);
-        if (text.at(text.size()-1) == ',')
-            return clang::Lexer::getSourceText(CharSourceRange::getCharRange(stmt->getSourceRange()), *sm, LangOptions(), 0);
-        return text;
-    }
-private:
-    SourceManager* sm;
-    ASTContext* astContext;
-    
 };
 
 static RuleSet rules(new DereferencingNullPointerRule()); 

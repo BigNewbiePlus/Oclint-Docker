@@ -78,25 +78,21 @@ public:
 
     virtual void setUp() override {}
     virtual void tearDown() override {}
-
-    /* Visit CXXTryStmt */
-    bool VisitCXXTryStmt(CXXTryStmt *cxxTryStmt)
+    
+    /* Visit CXXCatchStmt */
+    
+    bool VisitCXXCatchStmt(CXXCatchStmt *catchStmt)
     {
-        unsigned num = cxxTryStmt->getNumHandlers();
-        for(unsigned i=0;i<num;i++){
-            CXXCatchStmt * catchStmt = cxxTryStmt->getHandler(i);
-            Stmt* stmt = catchStmt->getHandlerBlock();
-            if(isa<CompoundStmt>(stmt)){
-               CompoundStmt* compoundStmt = dyn_cast<CompoundStmt>(stmt);
-                if(compoundStmt->size()==0){
-                    string message = "An empty exception handler. Silent suppression of exceptions can hide the presence of bugs in source code during testing.";
-                    addViolation(catchStmt, this, message);
-                }
+        Stmt* stmt = catchStmt->getHandlerBlock();
+        if(isa<CompoundStmt>(stmt)){
+            CompoundStmt* compoundStmt = dyn_cast<CompoundStmt>(stmt);
+            if(compoundStmt->size()==0){
+                string message = "An empty exception handler. Silent suppression of exceptions can hide the presence of bugs in source code during testing.";
+                addViolation(catchStmt, this, message);
             }
         }
         return true;
     }
-     
 };
 
 static RuleSet rules(new EmptyExceptionHandlerRule());

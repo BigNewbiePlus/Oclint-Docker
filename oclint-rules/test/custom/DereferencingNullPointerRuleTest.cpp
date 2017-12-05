@@ -13,18 +13,10 @@ TEST(DereferencingNullPointerRuleTest, PropertyTest)
 TEST(DereferencingNullPointerRuleTest, NoViolationInstance)    
 {
     
-    testRuleOnCXXCode(new DereferencingNullPointerRule(),
-                   "#include<stdio.h>\n"
-                   "#include<stdlib.h>\n"
-                   "#define bool int\n"
-                   "class Pointer{\n"
-                   "public:"
-                   "bool m_a;\n"
-                   "bool x(){return true;}\n"
-                   "};\n"
-                   "void m(){\n"
-                   "Pointer* pointer;\n"
-                   "if (pointer != 0 && pointer->m_a) {}"
+    testRuleOnCode(new DereferencingNullPointerRule(),
+                   "typedef struct person{int m_a;}Person;"
+                   "void m(){"
+                   "Person* lily;if(lily != 0 && lily->m_a) {}"
                    "}");
     testRuleOnCXXCode(new DereferencingNullPointerRule(),
                    "#include<stdio.h>\n"
@@ -76,32 +68,6 @@ TEST(DereferencingNullPointerRuleTest, NoViolationInstance)
                    "void m(){\n"
                    "int* a;\n"
                    "if (a != 0 && *a) {}"
-                   "}");
-    testRuleOnCXXCode(new DereferencingNullPointerRule(),
-                   "#include<stdio.h>\n"
-                   "#include<stdlib.h>\n"
-                   
-                   "class Pointer{\n"
-                   "public:"
-                   "bool m_a;\n"
-                   "bool x(){return true;}\n"
-                   "};\n"
-                   "void m(){\n"
-                   "int* DI;\n"
-                   "if (DI) {printf(\"%d\",*DI);}"
-                   "}");
-    testRuleOnCXXCode(new DereferencingNullPointerRule(),
-                   "#include<stdio.h>\n"
-                   "#include<stdlib.h>\n"
-                   
-                   "class Pointer{\n"
-                   "public:"
-                   "bool m_a;\n"
-                   "bool x(){return true;}\n"
-                   "};\n"
-                   "void m(){\n"
-                   "int* DI;\n"
-                   "if (!DI) {}else printf(\"%d\",*DI);"
                    "}");
 }
 
@@ -200,43 +166,4 @@ TEST(DereferencingNullPointerRuleTest, Test5)
             0, 9, 4, 9, 15, "Dereferencing of the null pointer 'a' might take place. Check the logical condition.");
 }
 
-
-TEST(DereferencingNullPointerRuleTest, Test6)
-{
-         
-    testRuleOnCXXCode(new DereferencingNullPointerRule(),                     
-                   "#include<stdio.h>\n"
-                   "#include<stdlib.h>\n"
-                      
-                   "class Pointer{\n"
-                   "public:"
-                   "bool m_a;\n"
-                   "bool x(){return true;}\n"
-                   "};\n"
-                   "void m(){\n"
-                   "int* DI;\n"
-                   "if (DI==0) {printf(\"%d\",\n*DI);}"
-                   "}",
-            0, 10, 2, 10, 2, "Dereferencing of the null pointer 'DI' might take place. Check the logical condition.");
-}
-
-
-TEST(DereferencingNullPointerRuleTest, Test7)
-{
-         
-    testRuleOnCXXCode(new DereferencingNullPointerRule(),                     
-                   "#include<stdio.h>\n"
-                   "#include<stdlib.h>\n"
-                   
-                   "class Pointer{\n"
-                   "public:"
-                   "bool m_a;\n"
-                   "bool x(){return true;}\n"
-                   "};\n"
-                   "void m(){\n"
-                   "int* DI;\n"
-                   "if (DI) {}else printf(\"%d\",\n*DI);"
-                   "}",
-            0, 10, 2, 10, 2, "Dereferencing of the null pointer 'DI' might take place. Check the logical condition.");
-}
 

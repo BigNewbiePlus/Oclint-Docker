@@ -1,6 +1,5 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
-#include "clang/Lex/Lexer.h"
 
 using namespace std;
 using namespace clang;
@@ -78,43 +77,34 @@ public:
 #endif
 
     virtual void setUp() override {
-        sm =&_carrier->getSourceManager();
     }
     virtual void tearDown() override {}
 
     /* Visit CompoundStmt */
-    bool VisitCompoundStmt(CompoundStmt *compoundStmt)
+    bool VisitCompoundStmt(CompoundStmt * cs)
     {
-        map<string, int> objNames;
-        for(CompoundStmt::body_iterator it=compoundStmt->body_begin(); it!=compoundStmt->body_end(); it++){
+        set<string> baseNames;
+        for(CompoundStmt::body_iterator it=cs->body_begin(); it!=cs->body_end(); it++){
             if(isa<CXXMemberCallExpr>(*it)){
                 CXXMemberCallExpr* callExpr = dyn_cast_or_null<CXXMemberCallExpr>(*it);
-                string funcName = callExpr->getMethodDecl()->getNameInfo().getAsString();
+                string funcName = callExpr->getDirectCallee()->getNameInfo().getAsString();
                 if(funcName=="clear"){
-                    string objName = expr2str(callExpr->getImplicitObjectArgument());
-                    objNames[objName]++;
-                    if(objNames[objName]==2){
-                        string message = "The 'clear' function is called twice for deallocation of the same resource.";
-                        addViolation(*it, this, message);
-                        return true;
+                    Expr* base = callExpr->getImplicitObjectArgument();
+                    if(isa<DeclRefExpr>(base)){
+                        DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(base);
+                        string baseName = dre->getNameInfo().getAsString();
+                        if(baseNames.find(baseName)!=baseNames.end()){
+                            string message = "The 'clear' function is called twice for deallocation of the same resource.";
+                            addViolation(*it, this, message);
+                            break;
+                        }
+                        baseNames.insert(baseName);
                     }
                 }
             }
         }
         return true;
     }
-
-    string expr2str(Expr* expr){
-        // (T, U) => "T,,"
-        string text = clang::Lexer::getSourceText(
-            CharSourceRange::getTokenRange(expr->getSourceRange()), *sm, LangOptions(), 0);
-        if (text.at(text.size()-1) == ',')
-            return clang::Lexer::getSourceText(CharSourceRange::getCharRange(expr->getSourceRange()), *sm, LangOptions(), 0);
-        return text; 
-    }
-
-private:
-    SourceManager* sm;
 };
 
 static RuleSet rules(new FooFunctionCalledTwiceForDeallocationRule()); 

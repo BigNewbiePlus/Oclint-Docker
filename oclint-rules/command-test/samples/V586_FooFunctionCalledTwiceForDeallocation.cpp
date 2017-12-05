@@ -1,8 +1,8 @@
 #include<vector>
-using namespace std;
+void foo(){}
 int main()
 {  
-    vector<int> a;
+    std::vector<int> a;
     a.clear();
     a.clear();
     return 0;

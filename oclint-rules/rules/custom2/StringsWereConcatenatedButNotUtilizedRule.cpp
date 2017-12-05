@@ -103,6 +103,7 @@ public:
                 if(type==strType && isConcateOperator(ewc)){//string类型
                     string message = "The strings were concatenated but are not utilized. Consider inspecting the expression.";
                     addViolation(*it, this, message);
+                    break;
                 }
             }
         }

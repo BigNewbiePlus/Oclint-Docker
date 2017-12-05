@@ -15,18 +15,9 @@ void m(){
     if (array == 0 && array[3]) { }
     int* DI;
     if(DI==0 && *DI){}
+    if(DI || *DI){}
 }
 
-void m3(){
-    int* DI;
-    if (DI == 0) {
-    printf("%d",*DI);
-    }
-    if (DI) {}
-    else if(DI){}
-    else
-        printf("%d",*DI);
-}
 
 int main()
 {

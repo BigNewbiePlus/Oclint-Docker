@@ -2,6 +2,7 @@ void foo()
 {
     bool a;
     if(a++){}
+    a++;
 }
 int main()
 {   
