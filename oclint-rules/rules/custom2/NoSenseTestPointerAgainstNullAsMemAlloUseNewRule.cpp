@@ -1,6 +1,6 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
-
+#include<set>
 using namespace std;
 using namespace clang;
 using namespace oclint;
@@ -87,7 +87,7 @@ public:
                 return vd;
             }
         }
-        return nullptr;
+        return 0;
     }
 
     string getCondVarName(Expr* expr){
@@ -116,20 +116,22 @@ public:
             if(isa<DeclStmt>(*it)){
                 DeclStmt* ds = dyn_cast_or_null<DeclStmt>(*it);
                 VarDecl* vd = getVarDecl(ds);
-                if(vd->hasInit() && isa<CXXNewExpr>(vd->getInit())){
+                if(vd && vd->hasInit() && isa<CXXNewExpr>(vd->getInit())){
                     newPtrNames.insert(vd->getNameAsString());
                 }
             }else if(isa<BinaryOperator>(*it)){
                 BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(*it);
-                if(isa<DeclRefExpr>(bo->getLHS()) && isa<CXXNewExpr>(bo->getRHS())){
-                    DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(bo->getLHS());
+                Expr* lhs = bo->getLHS();
+                Expr* rhs = bo->getRHS();
+                if(isa<DeclRefExpr>(lhs) && isa<CXXNewExpr>(rhs)){
+                    DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(lhs);
                     newPtrNames.insert(dre->getNameInfo().getAsString());
                 }
             }else if(isa<IfStmt>(*it)){
                 IfStmt* is = dyn_cast_or_null<IfStmt>(*it);
                 Expr* expr = is->getCond();
                 string name = getCondVarName(expr);
-                if(newPtrNames.find(name)!=newPtrNames.end()){
+                if(name.size()>0 && newPtrNames.find(name)!=newPtrNames.end()){
                     string message = "There is no sense in testing the '"+name+"' pointer against null, as the memory was allocated using the 'new' operator. The exception will be generated in the case of memory allocation error.";
                     addViolation(*it, this, message);
                 }

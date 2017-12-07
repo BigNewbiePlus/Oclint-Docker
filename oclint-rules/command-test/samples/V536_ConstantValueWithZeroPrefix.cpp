@@ -1,10 +1,10 @@
 
 void foo()
 {
-    int a = 01234;
 }
 int main()
 {
-    foo();
+    int a = 01234, b;
+    a=b*0706+a*00010;
     return 0;
 }

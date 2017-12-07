@@ -12,7 +12,7 @@ TEST(MisprintsCommaForSemicolonRuleTest, PropertyTest)
 TEST(MisprintsCommaForSemicolonRuleTest, NoViolationInstance)
 {
     testRuleOnCXXCode(new MisprintsCommaForSemicolonRule(), 
-            "void m(){int a,b;if(a!=0)a=1,b=2;}");
+            "void m(){int a,b;if(a!=0)return;}");
     testRuleOnCXXCode(new MisprintsCommaForSemicolonRule(), 
             "void m(){int a, b;if(a!=b){}else a=1, "
             "                                 b=2;}");
@@ -36,6 +36,6 @@ TEST(MisprintsCommaForSemicolonRuleTest, Test2)
             "int ab;\nif(ab==0)ab=1;"
             "         else\n"
             "            return ab=1,\n"
-            "         ab=2;return 0;}",0, 4, 20, 5, 13, "Consider checking for misprints. It's possible that ',' should be replaced by ';'.");
+            "         ab=2;return 0;}",0, 4, 13, 5, 13, "Consider checking for misprints. It's possible that ',' should be replaced by ';'.");
 }
 

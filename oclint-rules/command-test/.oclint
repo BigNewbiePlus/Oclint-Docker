@@ -1,14 +1,15 @@
 rules:
  - AddSemiAfterIfForWhileCondition
-#mid - AllocaInLoop
+ - AllocaInLoop
  - ArgumentOfSizeofIsExpression
  - ArrayIndexOutOfBound
  - AssignInCondition
  - AssignSameVariableTwiceSuccessively
  - AssignWithUninitVariable
- - AssignZeroValueToPointer
+ - AssignZeroValueToPointer 
  - BoolIncrement
  - ClassAsStringArgument
+
  - CmpFuncUseInCondition
  - CompareBoolWithInt
  - ComparePointerWithZeroValue
@@ -19,8 +20,9 @@ rules:
  - DividingSizeofAPointerByAnotherValue
  - ElseAlignWhichIfProblem
  - EmptyExceptionHandler
+
  - FormatStringIntoItselfInSprintf
-#error - IdenticalSubExprs
+ - IdenticalSubExprs
  - IllegalThrowWithoutInTryCatchInDestructor
  - InvalidPointToLocalArray
  - InvalidPointToLocalVariable
@@ -29,6 +31,7 @@ rules:
  - LowerPriorityOfConditionalExpression
  - MemFunCallLeadOverOrUnderFlowWithSizeof
  - MissingSemicolonAfterReturn
+ 
  - NonSensicalPointerComparn
  - NoNullFunctionPointerComparedWithNull
  - OddFloatPreciseComparision
@@ -39,9 +42,10 @@ rules:
  - SameArgumentForFuncCall
  - SameVariableUseInForLoop
  - StrlenConstantValueInMalloc
-#very slow - ThenAndElseBodyEquivalent
+
+ - ThenAndElseBodyEquivalent
  - TwoDimArrayToPointer
-#error# - TwoFunctionBodyEquivalent
+ - TwoFunctionBodyEquivalent
  - TwoSizeofMultiplied
  - UnsignedValueMinusComapre
  - UseCommaInArrayIndex
@@ -49,11 +53,73 @@ rules:
  - WithoutUseReturnValueOfFunction
  - WrongVariableComparedInForLoop
  - WrongVariableIncreaseInForLoop
+
+# 后50条
+
+ - AbsolutePathToFileAndDirUsed
+ - ArgumentOfSizeofIsNumber
+ - ArrayPointerAlwaysNotEqualNULL
+ - AssignAndComparisionExpressionError
+ - BitShiftOperatorLowPriority
+ - BitwiseOperationWithNonZeroConstantValue
+ - BitwiseOperationWithZeroConstantValue
+ - CommaMissingInIntArrayInit
+ - CompareThisWithNULLShouldBeAvoid
+ - ConditionOfLoopAlwaysTrueOrFalse
+
+ - ContinueWillTerminateDoWhileFalseLoop
+ - CreateSameLocalVariableAsControlVariableWithinLoop
+ - ElseBlockWasPossibleForgottenOrCommentOut
+ - ElseKeywordMissedAccodingToItsFormat
+ - ExcessiveConditionExpression
+ - ExpressionEnclosedByParenthesesTwice
+ - FooFunctionCalledTwiceForDeallocation
+ - FreeArrayMemory
+ - FunctionReceivesAnOddArgument
+ - IdenticalAlongsideIfCondition
+
+ - ImplicitlyCastFromIntegerToRealType
+ - IncompatibleMemoryAllocationAndDeallocationMethod
+ - InitAndFinalForIteratorValueAreSame
+ - IteratorInitAndFinalValueDifferInForLoop
+ - MacroExpansionResultIncorrectOrder
+ - MisprintsCommaForSemicolon
+ - NonVoidFunctionShouldReturnAValue
+ - NoSenseTestPointerAgainstNullAsMemAlloUseNew
+ - OddBitwiseOperation
+ - OddOperatorOfEqualPlus
+
+ - OddSequenceAssignOfAB
+ - OperationExecuted3TimesInSuccession
+ - OperationLogicNotCorrespondWithItsFormat
+ - OwnerlessExpression
+ - OwnerlessToken
+ - PatternAOrAExpressionIsExecessive
+ - PointerPlusConstantConditionIsFalse
+ - RangeIntersectionAreWithinConditionExpression
+ - RecurringCheck
+ - SameReturnValueOfConditionalOperator
+
+ - SameValuePresentOnBothSideOfOperator
+ - StringOfTwoPartsUsedForArrayInitialization
+ - StringsWereConcatenatedButNotUtilized
+ - SuspiciousComparisionPatternWithAEqualBEqualC
+ - SuspiciousCompoundAssignmentExpression
+ - SuspiciousMixOfIntegerAndRealExpression
+ - TruncationOfConstantValue
+ - TwoIfStmtWithIdenticalCondtion
+ - UnaryMinusCanntModifyBoolValue
+ - UnconditionalBreakWithinALoop
+
+ - UnsignedValueComparedToNegativeNumber
+ - VariableInitializedThroughItself
+ - VariableIsAssignedToItself
+ - VariablesInitializedThroughSameFunctionCall
 #rulePaths:
-rule-paths:
-#  ## - /home/fdh/oclint/build/oclint-rules/rules.dl
-# - /home/fdh/oclint/build/oclint-release/lib/oclint/rules/
-output: oclint.html
-report-type: html
+#rule-paths:
+#  ### - /home/fdh/oclint/build/oclint-rules/rules.dl
+## - /home/fdh/oclint/build/oclint-release/lib/oclint/rules/
+#output: oclint.html
+#report-type: html
 #enable-global-analysis:false
 enable-clang-static-analyzer: false

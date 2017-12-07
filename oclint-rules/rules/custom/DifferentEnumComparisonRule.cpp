@@ -1,7 +1,6 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
 #include "clang/Lex/Lexer.h"
-#include<fstream>
     
 using namespace std;
 using namespace clang;
@@ -79,9 +78,9 @@ public:
 #endif
 
     virtual void setUp() override {
-        sm = &_carrier->getSourceManager();fwrite.open("/home/fdh/info.txt",ios::app);
+        sm = &_carrier->getSourceManager();
     }
-    virtual void tearDown() override {fwrite.close();}
+    virtual void tearDown() override {}
 
     /* Visit BinaryOperator */
     bool VisitBinaryOperator(BinaryOperator *node)
@@ -151,12 +150,11 @@ private:
         // (T, U) => "T,,"
         string text = clang::Lexer::getSourceText(
             CharSourceRange::getTokenRange(expr->getSourceRange()), *sm, LangOptions(), 0);
-        if (text.at(text.size()-1) == ',')
+        if (text.size()>0&&text.at(text.size()-1) == ',')
             return clang::Lexer::getSourceText(CharSourceRange::getCharRange(expr->getSourceRange()), *sm, LangOptions(), 0);
         return text;
     }
 private:
-    fstream fwrite;
     SourceManager* sm;
 };
 

@@ -16,9 +16,20 @@ TEST(ConstantValueWithZeroPrefixRuleTest, NoViolationInstance)
 }
 
 TEST(ConstantValueWithZeroPrefixRuleTest, Test1)
-{
-         
+{         
     testRuleOnCode(new ConstantValueWithZeroPrefixRule(),                     
                       "void foo(){for(int i=\n0123;i<10;i++){}}",
+            0, 2, 1, 2, 1, "Be advised that the utilized constant value is represented by an octal form.");
+}
+TEST(ConstantValueWithZeroPrefixRuleTest, Test2)
+{         
+    testRuleOnCode(new ConstantValueWithZeroPrefixRule(),                     
+                      "void foo(){int a=\n0123;}",
+            0, 2, 1, 2, 1, "Be advised that the utilized constant value is represented by an octal form.");
+}
+TEST(ConstantValueWithZeroPrefixRuleTest, Test3)
+{         
+    testRuleOnCode(new ConstantValueWithZeroPrefixRule(),                     
+                      "void foo(){int a; int b=a*\n0706+a;}",
             0, 2, 1, 2, 1, "Be advised that the utilized constant value is represented by an octal form.");
 }

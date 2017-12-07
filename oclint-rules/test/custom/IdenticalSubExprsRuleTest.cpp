@@ -24,32 +24,6 @@ TEST(IdenticalSubExprsRuleTest, Test1)
             0, 1, 19, 1, 22, "'a' repeated!");
 }
 
-TEST(IdenticalSubExprsRuleTest, Test2) 
-{
-
-    testRuleOnCXXCode(new IdenticalSubExprsRule(), 
-            "void m(){int a,b,c;if(a||b||c||a){}}",
-            0, 1, 23, 1, 32, "'a' repeated!");
-    
-}
-
-TEST(IdenticalSubExprsRuleTest, Test3) 
-{
-
-    testRuleOnCXXCode(new IdenticalSubExprsRule(), 
-            "void m(){int a;if(a||(a)){}}",
-            0, 1, 19, 1, 24, "'a' repeated!");
-    
-}
-
-TEST(IdenticalSubExprsRuleTest, Test4) 
-{
-
-    testRuleOnCXXCode(new IdenticalSubExprsRule(), 
-            "void foo(){int a,b,c;if((a&&b)&&(c&&a)){}}",
-            0, 1, 25, 1, 38, "'a' repeated!");
-    
-}
 
 TEST(IdenticalSubExprsRuleTest, Test5) 
 {

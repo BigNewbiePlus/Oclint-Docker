@@ -98,7 +98,7 @@ public:
     std::string stmt2str(Stmt *stmt) {
         // (T, U) => "T,,"
         string text = clang::Lexer::getSourceText(CharSourceRange::getTokenRange(stmt->getSourceRange()), *sm, LangOptions(), 0);
-        if (text.at(text.size()-1) == ',')
+        if (text.size()>0&&text.at(text.size()-1) == ',')
             return clang::Lexer::getSourceText(CharSourceRange::getCharRange(stmt->getSourceRange()), *sm, LangOptions(), 0);
         return text;
     } 

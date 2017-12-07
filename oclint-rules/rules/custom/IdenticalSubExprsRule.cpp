@@ -89,26 +89,10 @@ public:
         Expr* lhs = binaryOperator->getLHS();    
         Expr* rhs = binaryOperator->getRHS();
         
-        vector<Expr*> lhsSubExprs = getEqualPrioritySubExprs(lhs);       
-        vector<Expr*> rhsSubExprs = getEqualPrioritySubExprs(rhs);
-        
-        lhsSubExprs.insert(lhsSubExprs.end(), rhsSubExprs.begin(), rhsSubExprs.end());
-                 
-        vector<string> subExprsStr;
-        
-        for(auto subExpr: lhsSubExprs){  
-            string exprStr = expr2str(subExpr);
-            subExprsStr.push_back(exprStr);
-        }
-        
-        for(int i=0;i<subExprsStr.size()-1;i++){ 
-            for(int j=i+1;j<subExprsStr.size();j++){
-                if((subExprsStr[i].size()==subExprsStr[j].size()) && (subExprsStr[i]==subExprsStr[j])){
-                    string message = "'"+subExprsStr[i]+"' repeated!";
-                    addViolation(binaryOperator, this, message);
-                    return true;                            
-                }
-            }
+        string expr1 = expr2str(lhs);
+        if(expr1==expr2str(rhs)){            
+            string message = "'"+expr1+"' repeated!";
+            addViolation(binaryOperator, this, message);
         }
         return true;
     }
@@ -116,37 +100,9 @@ private:
     std::string expr2str(Expr *expr) {
         // (T, U) => "T,,"
         string text = clang::Lexer::getSourceText(CharSourceRange::getTokenRange(expr->getSourceRange()), *sm, LangOptions(), 0);
-        if (text.at(text.size()-1) == ',')
+        if (text.size()>0 && text.at(text.size()-1) == ',')
             return clang::Lexer::getSourceText(CharSourceRange::getCharRange(expr->getSourceRange()), *sm, LangOptions(), 0);
         return text;
-    }
-    vector<Expr*> getEqualPrioritySubExprs(Expr* expr)
-    {
-        while(true){
-            if(isa<ImplicitCastExpr>(expr)){
-                ImplicitCastExpr* implicitCastExpr = dyn_cast<ImplicitCastExpr>(expr);
-                expr = implicitCastExpr->getSubExpr();
-            }else if(isa<ParenExpr>(expr)){
-                ParenExpr* parenExpr = dyn_cast_or_null<ParenExpr>(expr);
-                expr = parenExpr->getSubExpr();
-            }else if(isa<BinaryOperator>(expr)){
-                BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(expr);
-                BinaryOperatorKind bok = binaryOperator->getOpcode();
-                
-                if(bok==BO_LAnd || bok==BO_LOr){
-                    vector<Expr*> lhsSubExprs = getEqualPrioritySubExprs(binaryOperator->getLHS());
-                    vector<Expr*> rhsSubExprs = getEqualPrioritySubExprs(binaryOperator->getRHS());
-                    lhsSubExprs.insert(lhsSubExprs.end(), rhsSubExprs.begin(), rhsSubExprs.end());
-                    return lhsSubExprs; 
-                }
-                break;
-            }else
-                break;
-        }
-        
-        vector<Expr*> result;
-        result.push_back(expr);
-        return result;
     }
 private:
     clang::SourceManager* sm;

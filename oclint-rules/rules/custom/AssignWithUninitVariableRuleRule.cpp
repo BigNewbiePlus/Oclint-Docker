@@ -2,9 +2,6 @@
 #include "oclint/RuleSet.h"
 #include "clang/Lex/Lexer.h"
 
-#include<iostream>
-#include<fstream>
-    
 using namespace std;
 using namespace clang;
 using namespace oclint;
@@ -42,7 +39,7 @@ public:
 
     virtual const std::string description() const override
     {
-        return ""; // TODO: fill in the description of the rule.
+        return ""; // TODO: fill in the description of the this.
     }
 
     virtual const std::string example() const override
@@ -65,15 +62,11 @@ public:
 #endif
 
     virtual void setUp() override {
-        myfile.open ("/home/lupeng/example.txt", ios::app);
-        //myfile<<"\n\n\n******************************************"<<endl;
-        rule = this;
         literal = "Literal"; //字面值,表示变量值
         maxlevel = 2; //最大探查深度
         sm = &_carrier->getSourceManager();
     }
     virtual void tearDown() override {
-        myfile.close();
     }
 
     //Visit FunctionDecl
@@ -114,14 +107,14 @@ private:
         // (T, U) => "T,,"
         string text = clang::Lexer::getSourceText(
             CharSourceRange::getTokenRange(d->getSourceRange()), *sm, LangOptions(), 0);
-        if (text.at(text.size()-1) == ',')
+        if (text.size()>0&&text.at(text.size()-1) == ',')
             return clang::Lexer::getSourceText(CharSourceRange::getCharRange(d->getSourceRange()), *sm, LangOptions(), 0);
         return text;
     }
     std::string expr2str(Expr *expr) {
         // (T, U) => "T,,"
         string text = clang::Lexer::getSourceText(CharSourceRange::getTokenRange(expr->getSourceRange()), *sm, LangOptions(), 0);
-        if (text.at(text.size()-1) == ',')
+        if (text.size()>0&&text.at(text.size()-1) == ',')
             return clang::Lexer::getSourceText(CharSourceRange::getCharRange(expr->getSourceRange()), *sm, LangOptions(), 0);
         return text;
     }
@@ -190,7 +183,7 @@ private:
         string decl_str = "'"+decl2str(decl)+"'";   
         if(level==1){
             res = decl_str+" The local variable "+res + " is uninitialized!";
-            addViolation(decl, rule, res);
+            addViolation(decl, this, res);
         }else{
             res = decl_str+" The parameters "+res + " is uninitialized!";
             wrong_info.push_back(res);    
@@ -283,7 +276,7 @@ private:
         string expr_str = "'"+expr2str(expr)+"'";   
         if(level==1){
             res = expr_str+" The local variable "+res + " is uninitialized!";
-            addViolation(expr, rule, res);
+            addViolation(expr, this, res);
         }else{
             res = expr_str+" The parameters "+res + " is uninitialized!";
             wrong_info.push_back(res);    
@@ -325,7 +318,7 @@ private:
         string expr_str = "'"+expr2str(callExpr)+"'";
         for(auto str:wrong_info){
             string message = expr_str+" Function call error! "+str;
-            addViolation(callExpr, rule, message);    
+            addViolation(callExpr, this, message);    
         }        
     }
     
@@ -367,8 +360,6 @@ private:
     
 
 private:
-    ofstream myfile;
-    RuleBase* rule;
     string literal;
     int maxlevel;
     clang::SourceManager *sm;

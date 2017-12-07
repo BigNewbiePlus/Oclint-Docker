@@ -1,9 +1,14 @@
 #include<vector>
+void foo()
+{
+    int a;
+    if(a)return;
+}
+
 int main()
 {
     int a;
-    if(a)
-        a=1;
+    if(a){} 
     else
         a=2,
     a=3;

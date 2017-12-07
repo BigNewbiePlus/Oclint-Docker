@@ -120,7 +120,7 @@ private:
         // (T, U) => "T,,"
         string text = clang::Lexer::getSourceText(
             CharSourceRange::getTokenRange(expr->getSourceRange()), *sm, LangOptions(), 0);
-        if (text.at(text.size()-1) == ',')
+        if (text.size()>0 && text.at(text.size()-1) == ',')
             return clang::Lexer::getSourceText(CharSourceRange::getCharRange(expr->getSourceRange()), *sm, LangOptions(), 0);
         return text;
     }

@@ -11,6 +11,7 @@ int main()
     if(ptr!=NULL){}
 
     person* lily = new person();
+    lily = new person[10];
     if(lily==NULL){}
     return 0;
 }

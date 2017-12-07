@@ -83,11 +83,11 @@ public:
     virtual void tearDown() override {}
 
     /* Visit IntegerLiteral */
-    bool VisitIntegerLiteral(IntegerLiteral *node)
+    bool VisitIntegerLiteral(IntegerLiteral *il)
     {
-        string intStr = int2str(node);
-        if(startWithZero(intStr)){
-            addViolation(node, this,"Be advised that the utilized constant value is represented by an octal form.");
+        string str = int2str(il);
+        if(startWithZero(str)){
+            addViolation(il, this,"Be advised that the utilized constant value is represented by an octal form.");
         }
         return true;
     }
@@ -95,7 +95,7 @@ public:
 private:
     bool startWithZero(string str){
         
-        if(str.size()>2 && str[0]=='0' && str[1]!='x' && str[1]!='X'){
+        if(str.size()>=2 && str[0]=='0' && str[1]!='x' && str[1]!='X'){
             return true;
         }
         return false;
@@ -104,12 +104,12 @@ private:
         // (T, U) => "T,,"
         string text = clang::Lexer::getSourceText(
             CharSourceRange::getTokenRange(node->getSourceRange()), *sm, LangOptions(), 0);
-        if (text.at(text.size()-1) == ',')
+        if (text.size()>0 && text.at(text.size()-1) == ',')
             return clang::Lexer::getSourceText(CharSourceRange::getCharRange(node->getSourceRange()), *sm, LangOptions(), 0);
         return text;
     } 
 private:
-    SourceManager* sm;
+   SourceManager* sm;
      
 };
 

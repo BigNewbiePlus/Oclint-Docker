@@ -54,3 +54,8 @@ RUN ./clang build -release && ./countly build && ./googleTest build && ./test
 RUN apt-get update && apt-get install -y vim-gtk
 
 
+# 生成库
+COPY ./oclint-rules /usr/src/app/oclint/oclint-rules
+
+RUN ./build -release && ./bundle -release
+

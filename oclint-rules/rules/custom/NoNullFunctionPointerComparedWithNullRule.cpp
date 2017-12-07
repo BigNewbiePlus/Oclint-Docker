@@ -2,7 +2,6 @@
 #include "oclint/RuleSet.h"
 #include "clang/Lex/Lexer.h"
 
-#include<fstream>
 using namespace std;
 using namespace clang;
 using namespace oclint;
@@ -80,10 +79,8 @@ public:
 
     virtual void setUp() override {
         sm = &_carrier->getSourceManager();
-        fwrite.open("/home/fdh/info.txt",ios::app);
     }
     virtual void tearDown() override {
-        fwrite.close();
     }
 
     /* Visit IfStmt */
@@ -129,7 +126,7 @@ private:
     std::string expr2str(Expr *expr) {
         // (T, U) => "T,,"
         string text = clang::Lexer::getSourceText(CharSourceRange::getTokenRange(expr->getSourceRange()), *sm, LangOptions(), 0);
-        if (text.at(text.size()-1) == ',')
+        if (text.size()>0&&text.at(text.size()-1) == ',')
             return clang::Lexer::getSourceText(CharSourceRange::getCharRange(expr->getSourceRange()), *sm, LangOptions(), 0);
         return text;
     }
@@ -180,7 +177,6 @@ private:
     }
 private:
     SourceManager* sm;
-    ofstream fwrite;
 };
 
 static RuleSet rules(new NoNullFunctionPointerComparedWithNullRule());
