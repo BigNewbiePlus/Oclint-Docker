@@ -95,15 +95,15 @@ public:
     
 private:
     int getArrayBound(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
-            ImplicitCastExpr* implicitCastExpr = dyn_cast<ImplicitCastExpr>(expr);
-            expr = implicitCastExpr->getSubExpr();
+        if(expr && isa<ImplicitCastExpr>(expr)){
+            ImplicitCastExpr* ic = dyn_cast<ImplicitCastExpr>(expr);
+            expr = ic->getSubExpr();
         }
-        if(isa<DeclRefExpr>(expr)){
+        if(expr && isa<DeclRefExpr>(expr)){
            DeclRefExpr* declRefExpr = dyn_cast<DeclRefExpr>(expr);
-            ValueDecl* valueDecl = declRefExpr->getDecl();
-            if(valueDecl->getType()->isArrayType()){  
-                string type = valueDecl->getType().getAsString();
+           ValueDecl* vd = declRefExpr->getDecl();
+            if(vd && vd->getType()->isArrayType()){  
+                string type = vd->getType().getAsString();
                 return getNum(type);  
             }
         }
@@ -115,6 +115,7 @@ private:
         for(int i=0;i<type.size();i++){
             if(type[i]=='['){
                 while(i<type.size() && type[++i]!=']')res.push_back(type[i]);
+                break;
             }
         }
         if(res.size()){
@@ -127,13 +128,13 @@ private:
     }
     
     int getIndex(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
-            ImplicitCastExpr* implicitCastExpr = dyn_cast<ImplicitCastExpr>(expr);
-            expr = implicitCastExpr->getSubExpr();
+        if(expr && isa<ImplicitCastExpr>(expr)){
+            ImplicitCastExpr* ice = dyn_cast<ImplicitCastExpr>(expr);
+            expr = ice->getSubExpr();
         }
-        if(isa<IntegerLiteral>(expr)){
-            IntegerLiteral* integerLiteral = dyn_cast<IntegerLiteral>(expr);
-            return integerLiteral->getValue().getSExtValue();
+        if(expr && isa<IntegerLiteral>(expr)){
+            IntegerLiteral* il = dyn_cast<IntegerLiteral>(expr);
+            return il->getValue().getSExtValue();
         }
         return -1;
     }

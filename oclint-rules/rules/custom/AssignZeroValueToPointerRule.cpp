@@ -101,11 +101,11 @@ public:
     }
 private:
     bool isZeroValue(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             auto implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr = implicitCastExpr->getSubExpr();
         }
-        if(isa<CharacterLiteral>(expr)){
+        if(expr && isa<CharacterLiteral>(expr)){
             CharacterLiteral* charLiteral = dyn_cast<CharacterLiteral>(expr);
             if(charLiteral->getValue()==0)return true;
         }
@@ -113,7 +113,7 @@ private:
     }
     
     bool isPointer(Expr* expr, string& pType){
-        if(expr->getType()->isPointerType()){
+        if(expr && expr->getType()->isPointerType()){
             pType = expr->getType().getAsString();
             return true;
         }

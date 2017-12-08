@@ -78,36 +78,31 @@ public:
 
     virtual void setUp() override {}
     virtual void tearDown() override {}
+    inline void checkBody(Stmt* stmt, string stmtType){
+        if(stmt && isa<NullStmt>(stmt)){
+            string message = "Odd semicolon ';' after '"+stmtType+"' operator.";
+            addViolation(node,this,message);
+        }
+        
+    }
     /* Visit IfStmt */
     bool VisitIfStmt(IfStmt *node)
     {
-        Stmt* then = node->getThen();
-        if(isa<NullStmt>(then)){
-            string message = "Odd semicolon ';' after 'if' operator.";
-            addViolation(node,this,message);
-        }
+        checkBody(node->getThen(), "if");
         return true;
     }
      
     /* Visit WhileStmt */
     bool VisitWhileStmt(WhileStmt *node)
     {
-        Stmt* body = node->getBody();
-        if(isa<NullStmt>(body)){
-            string message = "Odd semicolon ';' after 'while' operator.";
-            addViolation(node,this,message);
-        }
+        checkBody(node->getBody(), "while");
         return true;
     }
      
     /* Visit ForStmt */
     bool VisitForStmt(ForStmt *node)
     {
-        Stmt* body = node->getBody();
-        if(isa<NullStmt>(body)){
-            string message = "Odd semicolon ';' after 'for' operator.";
-            addViolation(node,this,message);
-        }
+        checkBody(node->getBody(), "for");
         return true;
     }
      

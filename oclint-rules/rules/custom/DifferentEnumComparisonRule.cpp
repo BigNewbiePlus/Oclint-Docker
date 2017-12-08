@@ -111,18 +111,16 @@ public:
         
         SwitchCase* switchCase = node->getSwitchCaseList();
         
-        while(switchCase){
-
-            if(isa<CaseStmt>(switchCase)){
+        while(switchCase && isa<CaseStmt>(switchCase)){
                 
-                CaseStmt* caseStmt = dyn_cast<CaseStmt>(switchCase);
-                Expr* lhs = caseStmt->getLHS();
-                string type2 = getEnumType(lhs);
+            CaseStmt* caseStmt = dyn_cast<CaseStmt>(switchCase);
+            Expr* lhs = caseStmt->getLHS();
+            string type2 = getEnumType(lhs);
                 
-                if(type2.size()&&type2!=type1){
-                    string message = "The values of different enum types are compared: switch(ENUM_TYPE_A) { case ENUM_TYPE_B: ... }.";
-                    addViolation(switchCase,this,message);
-                }
+            
+            if(type2.size()&&type2!=type1){
+                string message = "The values of different enum types are compared: switch(ENUM_TYPE_A) { case ENUM_TYPE_B: ... }.";
+                addViolation(switchCase,this,message);
             }
             switchCase = switchCase->getNextSwitchCase();
         }
@@ -131,15 +129,15 @@ public:
 private:
     string getEnumType(Expr* expr){
         string type = "";
-        while(isa<ImplicitCastExpr>(expr)){
+        while(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast<ImplicitCastExpr>(expr);
             expr = implicitCastExpr->getSubExpr();
         } 
         
-        if(isa<DeclRefExpr>(expr)){
+        if(expr && isa<DeclRefExpr>(expr)){
             DeclRefExpr* declRefExpr = dyn_cast<DeclRefExpr>(expr);
-            ValueDecl* valueDecl = declRefExpr->getDecl();
-            if(valueDecl->getType()->isEnumeralType()){
+            ValueDecl* vd = declRefExpr->getDecl();
+            if(vd && vd->getType()->isEnumeralType()){
               return valueDecl->getType().getAsString();  
             }
         }

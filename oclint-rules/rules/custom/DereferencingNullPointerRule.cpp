@@ -92,7 +92,7 @@ public:
     bool VisitIfStmt(IfStmt *node)
     {
         Expr* cond = node->getCond();
-        if(isa<BinaryOperator>(cond)){
+        if(cond && isa<BinaryOperator>(cond)){
             BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(cond);
             Expr* lhs = binaryOperator->getLHS();
             Expr* rhs = binaryOperator->getRHS();
@@ -122,7 +122,7 @@ private:
     /*********************************************getLPointerState***********************************************************/
     void getType(const Expr* expr, int& type, string& name){
         type=-1;
-        while(true){
+        while(expr){
             if(isa<ImplicitCastExpr>(expr)){
                 auto implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
                 expr = implicitCastExpr->getSubExpr();
@@ -132,11 +132,11 @@ private:
                 break;
             }else if(isa<DeclRefExpr>(expr)){
                 auto declRefExpr = dyn_cast_or_null<DeclRefExpr>(expr);
-                auto valueDecl = declRefExpr->getDecl();
+                auto vd = declRefExpr->getDecl();
                 
-                if(valueDecl->getType()->isPointerType() || valueDecl->getType()->isArrayType()){
+                if(vd && (vd->getType()->isPointerType() || vd->getType()->isArrayType())){
                     type=1;
-                    name = valueDecl->getNameAsString();
+                    name = vd->getNameAsString();
                 }
                 break;
             }else
@@ -149,7 +149,7 @@ private:
         
         bool unary = false;
         
-        if(isa<BinaryOperator>(expr)){
+        if(expr && isa<BinaryOperator>(expr)){
             BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(expr);
             BinaryOperatorKind bok = bo->getOpcode();
             if(bok!=BO_EQ && bok!=BO_NE)return ps;
@@ -171,7 +171,7 @@ private:
             else ps.isPointer=false;
             return ps;
             
-        }else if(isa<UnaryOperator>(expr)){
+        }else if(expr && isa<UnaryOperator>(expr)){
             auto unaryOperator = dyn_cast_or_null<UnaryOperator>(expr);
             expr = unaryOperator->getSubExpr();
             if(unaryOperator->getOpcode()==UO_LNot)unary=true; 
@@ -195,7 +195,7 @@ private:
         ps.isPointer = false;
         bool deref = false;
         
-        while(true){
+        while(expr){
             if(isa<ImplicitCastExpr>(expr)){
                 ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
                 expr = implicitCastExpr->getSubExpr();
@@ -217,10 +217,10 @@ private:
                 deref = true;
             }else if(isa<DeclRefExpr>(expr)){
                 DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(expr);
-                ValueDecl* valueDecl = declRefExpr->getDecl();
-                if(valueDecl->getType()->isPointerType() || valueDecl->getType()->isArrayType()){
+                ValueDecl* vd = declRefExpr->getDecl();
+                if(vd && (vd->getType()->isPointerType() || vd->getType()->isArrayType())){
                     ps.isPointer = true;
-                    ps.name = valueDecl->getNameAsString();
+                    ps.name = vd->getNameAsString();
                     ps.deref = deref;
                 }
                 break;

@@ -85,7 +85,7 @@ public:
     {
         if(node->getOpcode()==UO_PostInc){
             Expr* expr = node->getSubExpr();
-            if(expr->getType()->isBooleanType() && isa<DeclRefExpr>(expr)){
+            if(expr && expr->getType()->isBooleanType() && isa<DeclRefExpr>(expr)){
                 DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(expr);
                 string declName = dre->getNameInfo().getAsString();
                 string message = "A bool type variable is being incremented: "+declName+"++. Perhaps another variable should be incremented instead.";

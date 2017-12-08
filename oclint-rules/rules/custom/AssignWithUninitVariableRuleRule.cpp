@@ -72,6 +72,7 @@ public:
     //Visit FunctionDecl
     bool VisitFunctionDecl(FunctionDecl *fun_decl)
     {
+        if(!fun_decl)return true;
         int param_num = fun_decl->getNumParams();
         vector<bool> parent_params_info(param_num, true);//默认情况下父参数均已赋值
         map<string, ParamInfo> child_params_info;//调用函数的参数状况，需要回执
@@ -92,14 +93,13 @@ private:
         return res;
     }
     string getDeclRefExprName(Expr* expr){
-        if(isa<DeclRefExpr>(expr)){ //变量引用
+        if(expr && isa<ImplicitCastExpr>(expr)){//强制转化表达式
+            ImplicitCastExpr *ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
+            expr = ice->getSubExpr();
+        }
+        if(expr && isa<DeclRefExpr>(expr)){ //变量引用
             DeclRefExpr * ref = dyn_cast_or_null<DeclRefExpr>(expr);
             return ref->getNameInfo().getAsString();
-        }
-        if(isa<ImplicitCastExpr>(expr)){//强制转化表达式
-            ImplicitCastExpr *implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
-            DeclRefExpr *initExpr = dyn_cast_or_null<DeclRefExpr>(implicitCastExpr->getSubExpr());
-            return initExpr->getNameInfo().getAsString();
         }
         return literal;
     }
@@ -150,14 +150,13 @@ private:
         
         //获取当前函数主题内容
         Stmt* funBody = fun_decl->getBody();
-        
+        if(!isa<CompoundStmt>(funBody))return;
         CompoundStmt* compoundStmt = dyn_cast_or_null<CompoundStmt>(funBody);      
-        if(!compoundStmt)return;
 
         for (CompoundStmt::body_iterator body = compoundStmt->body_begin(), bodyEnd = compoundStmt->body_end();
              body != bodyEnd; body++){
             Stmt* bodyStmt = *body;      //获取其中一条语句
-            
+            if(!bodyStmt)break;
             if(isa<DeclStmt>(bodyStmt)){
                 DeclStmt* declStmt = dyn_cast_or_null<DeclStmt>(bodyStmt); //获取声明语句
                 checkDeclStmt(declStmt, child_params_info, vars_init, wrong_info, level); 
@@ -192,16 +191,18 @@ private:
     
     void checkDeclStmt(DeclStmt* declStmt, map<string, ParamInfo>& child_params_info, map<string, bool>& vars_init,
         vector<string>& wrong_info, int level)
-    {    
+    {   
+        if(!declStmt)return;
+
         for(clang::DeclGroupRef::iterator decl = declStmt->decl_begin(); decl != declStmt->decl_end(); decl++)
         {
-            Decl* one_decl = *decl;
-            if(isa<VarDecl>(one_decl)){//如果是变量表达式
-                VarDecl* var_decl = dyn_cast_or_null<VarDecl>(one_decl);
-                Expr* init_expr = var_decl->getInit(); //得到该变量的初始化语句
-                if(!init_expr) continue; //该变量为初始化,跳过
+            if(isa<VarDecl>(*decl)){//如果是变量表达式
+                VarDecl* vd = dyn_cast_or_null<VarDecl>(*decl);
+
+                if(!vd->hasInit())continue;
+                Expr* init_expr = vd->getInit(); //得到该变量的初始化语句
                 
-                std::string lname = var_decl->getNameAsString();
+                std::string lname = vd->getNameAsString();
                 
                 vector<string> rnames = checkNonAssignBinaryOperator(init_expr);//获取初始化表达式涉及的所有变量
                 
@@ -216,6 +217,8 @@ private:
     }
     
     bool isaLiteral(Expr* expr){
+        if(!expr)return false;
+
         if(isa<IntegerLiteral>(expr) || isa<CharacterLiteral>(expr) || isa<FloatingLiteral>(expr) ||
           isa<StringLiteral>(expr)){
             return true;
@@ -224,7 +227,7 @@ private:
     }
     vector<string> checkNonAssignBinaryOperator(Expr* expr){
         vector<string> result;
-        if(isa<BinaryOperator>(expr)){
+        if(expr && isa<BinaryOperator>(expr)){
             BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(expr);
             vector<string> lv = checkNonAssignBinaryOperator(binaryOperator->getLHS());
             vector<string> rv = checkNonAssignBinaryOperator(binaryOperator->getRHS());
@@ -232,20 +235,23 @@ private:
             result.insert(result.end(), rv.begin(), rv.end());
             return result;
         }
-        if(isa<CallExpr>(expr) || isaLiteral(expr)){//调用了函数或是个变量值
+        if(expr && isa<CallExpr>(expr) || expr&&isaLiteral(expr)){//调用了函数或是个变量值
             result.push_back(literal);
             return result;
         }
-        if(isa<ParenExpr>(expr)){//带括号
+        if(expr && isa<ParenExpr>(expr)){//带括号
             ParenExpr* parenExpr = dyn_cast_or_null<ParenExpr>(expr);
             result = checkNonAssignBinaryOperator(parenExpr->getSubExpr());
             return result;
         }
-        if(isa<ImplicitCastExpr>(expr)){//强制转化表达式
-            ImplicitCastExpr *implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
-            DeclRefExpr *initExpr = dyn_cast_or_null<DeclRefExpr>(implicitCastExpr->getSubExpr());
-            std::string rname =  initExpr->getNameInfo().getAsString();
-            result.push_back(rname);
+        if(expr && isa<ImplicitCastExpr>(expr)){//强制转化表达式
+            ImplicitCastExpr *ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
+            Expr* expr = ice->getSubExpr();
+            if(isa<DeclRefExpr>(expr)){
+                DeclRefExpr *dre = dyn_cast_or_null<DeclRefExpr>(expr);
+                std::string rname =  initExpr->getNameInfo().getAsString();
+                result.push_back(rname);
+            }
         }
         return result;
     }
@@ -287,9 +293,9 @@ private:
         Expr* rhs = binaryOperator;
         //解析赋值语句和表达式语句
         vector<string> lnames;
-        while(isa<BinaryOperator>(rhs)){
+        while(irhs && isa<BinaryOperator>(rhs)){
             BinaryOperator* binary = dyn_cast_or_null<BinaryOperator>(rhs);
-            if(binary->isAssignmentOp()){
+            if(binary->getOpcode()==BO_Assign){
                 Expr* lhs = binaryOperator->getLHS(); //获取左端
                 rhs = binaryOperator->getRHS(); //获取赋值符号右端
                 string lname = getDeclRefExprName(lhs); //获取左端变量名

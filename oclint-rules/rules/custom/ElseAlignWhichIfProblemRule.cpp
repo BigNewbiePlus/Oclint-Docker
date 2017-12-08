@@ -85,7 +85,7 @@ public:
     bool VisitIfStmt(IfStmt *ifStmt)
     {
         Stmt* then = ifStmt->getThen();
-        if(isa<IfStmt>(then)){
+        if(then && isa<IfStmt>(then)){
             IfStmt* ifStmt2 = dyn_cast<IfStmt>(then);
             if(!ifStmt2->getElse())return true;
             

@@ -107,7 +107,7 @@ public:
 private:
     void checkCond(Expr* expr, string type)
     {
-        while(true){
+        while(expr){
             if(isa<UnaryOperator>(expr)){
                 UnaryOperator* unaryOperator = dyn_cast<UnaryOperator>(expr);
                 expr = unaryOperator->getSubExpr();

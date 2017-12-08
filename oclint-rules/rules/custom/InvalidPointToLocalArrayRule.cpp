@@ -92,7 +92,7 @@ public:
                 BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(body);
                 Expr* lhs = binaryOperator->getLHS();
                 Expr* rhs = binaryOperator->getRHS();
-                if(binaryOperator->getOpcodeStr()=="=" && 
+                if(binaryOperator->getOpcode()==BO_Assign && 
                    isPointerType(lhs) && isArrayType(rhs)){//赋值运算且左侧为指针变量
                     
                     string lname = getLHSName(lhs, localVarNames);
@@ -110,6 +110,7 @@ public:
     
 private:
     void getLocalDeclVarsName(DeclStmt* declStmt, map<string,bool>& varNames){
+        if(!declStmt)return;
         for(clang::DeclStmt::decl_iterator decl_it = declStmt->decl_begin(); decl_it!=declStmt->decl_end();decl_it++){
             Decl* decl = *decl_it;
             if(isa<VarDecl>(decl)){
@@ -121,20 +122,20 @@ private:
         
     }
     bool isPointerType(Expr* expr){
-        return expr->getType()->isPointerType();
+        return expr && expr->getType()->isPointerType();
     }
     
     bool isArrayType(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr = implicitCastExpr->getSubExpr();
         }
-        return expr->getType()->isArrayType();
+        return expr && expr->getType()->isArrayType();
     }
     
     string getLHSName(Expr* lhs, map<string, bool>& localVarNames){
         string lname;
-        if(isa<DeclRefExpr>(lhs)){
+        if(lhs && isa<DeclRefExpr>(lhs)){
             DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(lhs);
             lname = declRefExpr->getNameInfo().getAsString();
         }
@@ -142,15 +143,15 @@ private:
     }
     string getRHSName(Expr* rhs, map<string, bool>& localVarNames){
         string rname;
-        if(isa<UnaryOperator>(rhs)){            
+        if(rhs && isa<UnaryOperator>(rhs)){            
             UnaryOperator* unaryOperator = dyn_cast_or_null<UnaryOperator>(rhs);                
             rhs = unaryOperator->getSubExpr();            
         }
-        if(isa<ImplicitCastExpr>(rhs)){
+        if(rhs && isa<ImplicitCastExpr>(rhs)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(rhs);
             rhs = implicitCastExpr->getSubExpr();
         }
-        if(isa<DeclRefExpr>(rhs)){
+        if(rhs && isa<DeclRefExpr>(rhs)){
             DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(rhs);
             rname = declRefExpr->getNameInfo().getAsString();
         }

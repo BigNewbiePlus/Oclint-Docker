@@ -1,6 +1,5 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
-#include "clang/Lex/Lexer.h"
 
 using namespace std;
 using namespace clang;
@@ -78,15 +77,13 @@ public:
 #endif
 
     virtual void setUp() override {
-        sm = &_carrier->getSourceManager();
     }
     virtual void tearDown() override {}
 
      /* Visit WhileStmt */
     bool VisitWhileStmt(WhileStmt *node)
     {
-        Stmt* body = node->getBody();
-        VisitLoopBody(body);
+        VisitLoopBody(node->getBody());
         return true;
     }
      
@@ -94,8 +91,7 @@ public:
     /* Visit DoStmt */
     bool VisitDoStmt(DoStmt *node)
     {
-        Stmt* body = node->getBody();
-        VisitLoopBody(body);
+        VisitLoopBody(node->getBody());
         return true;
     }
      
@@ -103,39 +99,53 @@ public:
     /* Visit ForStmt */
     bool VisitForStmt(ForStmt *node)
     {
-        Stmt* body = node->getBody();
-        VisitLoopBody(body);
+        VisitLoopBody(node->getBody());
         return true;
     }
     
-    void VisitLoopBody(Stmt* body){
+    inline void VisitLoopBody(Stmt* body){
+        if(!body)return;
+
         if(isa<CompoundStmt>(body)){//如果是复合语句
             CompoundStmt* compoundStmt = dyn_cast_or_null<CompoundStmt>(body);
             for(clang::CompoundStmt::body_iterator it = compoundStmt->body_begin(); it!=compoundStmt->body_end();it++){
-                Stmt* cur_body = *it;
-                VisitDeclOrExpr(cur_body);
+                VisitDeclOrExpr(*it);
             }
         }else
             VisitDeclOrExpr(body);
     }
     
     void VisitDeclOrExpr(Stmt* stmt){
-        string str = stmt2str(stmt);
-        if(str.find("alloca")!=std::string::npos){//存在开辟空间
-            addViolation(stmt, this, "The 'alloca' function is used inside the loop. This can quickly overflow stack.");
+        Expr* rhs = NULL;
+        if(stmt && isa<DeclStmt>(stmt)){
+            DeclStmt* ds = dyn_cast_or_null<DeclStmt>(stmt);
+            if(ds->isSingleDecl()){
+                Decl* decl = ds->getSingleDecl();
+                if(decl && isa<VarDecl>(decl)){
+                    VarDecl* vd = dyn_cast_or_null<VarDecl>(decl);
+                    if(vd->hasInit())rhs = vd->getInit();
+                }
+            }
+        }else if(stmt && isa<BinaryOperator>(stmt)){
+            BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(stmt);
+            if(bo->getOpcode()==BO_Assign){
+                rhs = bo->getRHS();
+            }
+        }
+        if(rhs && isa<CStyleCastExpr>(rhs)){
+            CStyleCastExpr* csce = dyn_cast_or_null<CStyleCastExpr>(rhs);
+            rhs = csce->getSubExpr();
+            if(rhs&&isa<CallExpr>(rhs)){
+                CallExpr* ce = dyn_cast_or_null<CStyleCastExpr>(rhs);
+                string funName = ce->getDirectCallee()->getNameInfo().getAsString();
+                if(funName == "__builtin_alloca"){
+                    string message = "The 'alloca' function is used inside the loop. This can quickly overflow stack."
+                    addViolation(stmt, this, message);
+                }
+            }
         }
     }
     
-    std::string stmt2str(clang::Stmt *stmt) {
-        // (T, U) => "T,,"
-        string text = clang::Lexer::getSourceText(
-            CharSourceRange::getTokenRange(stmt->getSourceRange()), *sm, LangOptions(), 0);
-        if (text.size()>0&&text.at(text.size()-1) == ',')
-            return clang::Lexer::getSourceText(CharSourceRange::getCharRange(stmt->getSourceRange()), *sm, LangOptions(), 0);
-        return text;
-    }
-private:
-    SourceManager* sm;
 
 };
 

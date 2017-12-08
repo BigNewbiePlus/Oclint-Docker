@@ -86,25 +86,25 @@ public:
     {
         if(node->getKind() != UETT_SizeOf)return true;
         Expr * expr = node->getArgumentExpr();
-        if(isa<ParenExpr>(expr)){
+        if(expr && isa<ParenExpr>(expr)){
             ParenExpr* parenExpr = dyn_cast<ParenExpr>(expr);
             expr = parenExpr->getSubExpr();
         }
         bool violation = false;
-        if(isa<BinaryOperator>(expr)){
+        if(expr&&isa<BinaryOperator>(expr)){
             violation = true;
-        }else if(isa<UnaryOperator>(expr)){
+        }else if(expr&&isa<UnaryOperator>(expr)){
             UnaryOperator* unaryOperator = dyn_cast<UnaryOperator>(expr);
             UnaryOperatorKind uok= unaryOperator->getOpcode();
             if(uok!=UO_Deref){ 
                 violation = true;
             }
-        }else if(isa<DeclRefExpr>(expr)){
+        }else if(expr && isa<DeclRefExpr>(expr)){
             DeclRefExpr* declRefExpr = dyn_cast<DeclRefExpr>(expr);
             if(declRefExpr->getType()->isPointerType()){
                 violation = true;
             }
-        }else if(isa<CXXThisExpr>(expr)){
+        }else if(expr && isa<CXXThisExpr>(expr)){
             violation=true;
         }
         if(violation){

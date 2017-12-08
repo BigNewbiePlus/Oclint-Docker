@@ -82,7 +82,7 @@ public:
     bool VisitIfStmt(IfStmt *ifStmt)
     {
         Expr* expr = ifStmt->getCond();
-        CallExpr* callExpr = getTheCmpExpr(expr);
+        CallExpr* callExpr = getCmpExprName(expr);
         if(callExpr){
             string name = callExpr->getDirectCallee()->getNameInfo().getAsString();
             string message = "The '"+name+"' function returns 0 if corresponding strings are equal. Consider examining the condition for mistakes.";
@@ -92,19 +92,20 @@ public:
     }
     
 private:
-    CallExpr* getTheCmpExpr(Expr* expr){
-        while(true){
+    CallExpr* getCmpExpr(Expr* expr){
+        
+        CallExpr* callExpr = NULL;
+        while(expr){
           
             if(isa<BinaryOperator>(expr)){           
-                BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(expr);
-                BinaryOperatorKind bok = binaryOperator->getOpcode();
-                CallExpr* callExpr = NULL;
+                BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(expr);
+                BinaryOperatorKind bok = bo->getOpcode();
             
                 if(bok==BO_LAnd||bok==BO_LOr){
-                    callExpr = getTheCmpExpr(binaryOperator->getLHS());
+                    callExpr = getCmpExpr(binaryOperator->getLHS());
                     if(!callExpr) callExpr = getTheCmpExpr(binaryOperator->getRHS());
                 }
-                return callExpr;
+                break;
         
             }else if(isa<ImplicitCastExpr>(expr)){
                 ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
@@ -113,17 +114,15 @@ private:
                 ParenExpr* parenExpr = dyn_cast_or_null<ParenExpr>(expr);
                 expr = parenExpr->getSubExpr();
             }else if(isa<CallExpr>(expr)){
-                CallExpr* callExpr = dyn_cast_or_null<CallExpr>(expr);
-                FunctionDecl * funcDecl = callExpr->getDirectCallee();
-                if(funcDecl){
-                    string funcName = funcDecl->getNameInfo().getAsString();
-                    if(funcName=="strcmp" || funcName=="memcmp")return callExpr;
-                }
-                return NULL;
+                callExpr = dyn_cast_or_null<CallExpr>(expr);
+                string funcName = callExpr->getDirectCallee()->getNameInfo().getAsString();
+                if(funcName=="strcmp" || funcName=="memcmp")return callExpr;
+                break;
             }else{
-                return NULL;
+                break;
             }  
         }
+        return callExpr;
     }
 };
 

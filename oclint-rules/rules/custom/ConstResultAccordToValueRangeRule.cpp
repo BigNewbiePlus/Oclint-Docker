@@ -122,19 +122,19 @@ private:
     void getTypeAndValue(Expr* expr,int& type,int& value)//0:char,1:unsigned,2:int,-1:其他
     {
         //ImplicitCastExpr
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr= implicitCastExpr->getSubExpr();
         }
         
-        if(isa<IntegerLiteral>(expr)){
+        if(expr && isa<IntegerLiteral>(expr)){
             IntegerLiteral* integerLiteral = dyn_cast<IntegerLiteral>(expr);
             type=2;
             value = integerLiteral->getValue().getSExtValue();
         
-        }else if(expr->getType()->isCharType()){
+        }else if(expr && expr->getType()->isCharType()){
                 type=0;     
-        }else if(expr->getType()->isUnsignedIntegerType()){    
+        }else if(expr && expr->getType()->isUnsignedIntegerType()){    
             type=1;     
         }else
             type=-1;

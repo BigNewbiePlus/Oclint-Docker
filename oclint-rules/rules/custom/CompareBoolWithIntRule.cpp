@@ -111,13 +111,13 @@ private:
     void getType(Expr* expr, int& type, int& value){
         type=-1;
         
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast<ImplicitCastExpr>(expr);
             expr = implicitCastExpr->getSubExpr();
         }
-        if(expr->getType()->isBooleanType()){
+        if(expr && expr->getType()->isBooleanType()){
             type=1;
-        }else if(expr->getType()->isIntegerType()){
+        }else if(expr && expr->getType()->isIntegerType()){
             
             int coff = 1;
             if(isa<UnaryOperator>(expr)){
@@ -125,7 +125,7 @@ private:
                 expr = unaryOperator->getSubExpr();
                 if(unaryOperator->getOpcode()==UO_Minus)coff=-1;
             }
-            if(isa<IntegerLiteral>(expr)){
+            if(expr && isa<IntegerLiteral>(expr)){
                 type=2;
                 IntegerLiteral* integerLiteral = dyn_cast<IntegerLiteral>(expr);
                 value = integerLiteral->getValue().getSExtValue();

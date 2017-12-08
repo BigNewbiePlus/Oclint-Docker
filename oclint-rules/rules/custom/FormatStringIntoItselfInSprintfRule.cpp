@@ -99,22 +99,22 @@ public:
     
 private:
     ValueDecl* getValueDecl(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr = implicitCastExpr->getSubExpr();
         }
-        if(isa<DeclRefExpr>(expr)){
+        if(expr && isa<DeclRefExpr>(expr)){
             DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(expr);
             return declRefExpr->getDecl();
         }
-        return nullptr;
+        return NULL;
     }
     bool refSamePointerVar(Expr* arg1,Expr* arg3, string& name)
     {
-        ValueDecl* valueDecl1 = getValueDecl(arg1);
-        ValueDecl* valueDecl3 = getValueDecl(arg3);
-        if(valueDecl1)name= valueDecl1->getNameAsString();
-        return valueDecl1 && valueDecl3 && valueDecl1==valueDecl3;
+        ValueDecl* vd1 = getValueDecl(arg1);
+        ValueDecl* vd3 = getValueDecl(arg3);
+        if(vd1)name= vd1->getNameAsString();
+        return vd1 && vd3 && vd1==vd3;
     }
      
 };

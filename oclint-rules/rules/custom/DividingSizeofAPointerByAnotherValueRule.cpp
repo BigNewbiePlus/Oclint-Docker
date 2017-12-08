@@ -94,12 +94,12 @@ public:
                     
         Expr* expr = unaryExprOrTypeTraitExpr->getArgumentExpr();
                 
-        if(isa<ParenExpr>(expr)){//可能存在括号
+        if(expr && isa<ParenExpr>(expr)){//可能存在括号
             ParenExpr* parenExpr = dyn_cast_or_null<ParenExpr>(expr);
             expr= parenExpr->getSubExpr();     
         }
                     
-        if(isa<DeclRefExpr>(expr)){            
+        if(expr && isa<DeclRefExpr>(expr)){            
             DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(expr);
             if(declRefExpr->getType()->isPointerType()){//指针
                 string lhsStr = expr2str(lhs);

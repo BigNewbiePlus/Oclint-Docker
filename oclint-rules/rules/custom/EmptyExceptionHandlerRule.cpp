@@ -84,7 +84,7 @@ public:
     bool VisitCXXCatchStmt(CXXCatchStmt *catchStmt)
     {
         Stmt* stmt = catchStmt->getHandlerBlock();
-        if(isa<CompoundStmt>(stmt)){
+        if(stmt && isa<CompoundStmt>(stmt)){
             CompoundStmt* compoundStmt = dyn_cast<CompoundStmt>(stmt);
             if(compoundStmt->size()==0){
                 string message = "An empty exception handler. Silent suppression of exceptions can hide the presence of bugs in source code during testing.";

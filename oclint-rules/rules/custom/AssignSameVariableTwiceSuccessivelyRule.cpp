@@ -83,47 +83,41 @@ public:
     virtual void tearDown() override {}
 
     /* Visit CompoundStmt */
-    bool VisitCompoundStmt(CompoundStmt *node)
+    bool VisitCompoundStmt(CompoundStmt *cs)
     {
-        clang::CompoundStmt::body_iterator body_it = node->body_begin();
-        if(body_it==node->body_end())return true;
-        Stmt* stmt1 = *body_it;
-        Stmt* stmt2;
-        for(body_it++; body_it!=node->body_end();body_it++){
-            stmt2 = *body_it;
-            checkSuccessiveStmt(stmt1, stmt2);
-            stmt1=stmt2;   
+        // 至少两个语句
+        if(cs->size()<2)return true;
+
+        // 分别记录前个和当前语句引用赋值变量名，没有则为空
+        string preRef, curRef;
+        for(CompoundStmt::body_iterator it=cs->body_begin(); it!=cs->body_end();it++){
+            curRef = "";
+            if(*it && isa<BinaryOperator>(*it)){
+                BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(*it);
+                if(bo->getOpcode()==BO_Assign){
+                    curRef = expr2str(bo->getLHS());
+                    if(preRef.size() && curRef.size() && preRef==curRef){
+                        string message = "The '"+curRef+"' object is assigned values twice successively. Perhaps this is a mistake.";
+                        addViolation(*it, this, message);
+                    }
+                }
+            }
+            preRef = curRef;
         }
         return true;
     }
-private:
+private: 
     std::string expr2str(Expr *expr) {
         // (T, U) => "T,,"
-        string text = clang::Lexer::getSourceText(CharSourceRange::getTokenRange(expr->getSourceRange()), *sm, LangOptions(), 0);
+        string text = clang::Lexer::getSourceText(
+            CharSourceRange::getTokenRange(expr->getSourceRange()), *sm, LangOptions(), 0);
         if (text.size()>0&&text.at(text.size()-1) == ',')
             return clang::Lexer::getSourceText(CharSourceRange::getCharRange(expr->getSourceRange()), *sm, LangOptions(), 0);
         return text;
     }
-    void checkSuccessiveStmt(Stmt* stmt1, Stmt* stmt2){
-        if(isa<BinaryOperator>(stmt1) && isa<BinaryOperator>(stmt2)){
-            BinaryOperator* binaryOperator1 = dyn_cast_or_null<BinaryOperator>(stmt1);
-            BinaryOperator* binaryOperator2 = dyn_cast_or_null<BinaryOperator>(stmt2);
-            
-            if(binaryOperator1->getOpcode()==BO_Assign && binaryOperator2->getOpcode()==BO_Assign){
-                Expr* lhs1 = binaryOperator1->getLHS();
-                Expr* lhs2 = binaryOperator2->getLHS();
-                string lhsStr1 = expr2str(lhs1);
-                string lhsStr2 = expr2str(lhs2);
-                if(lhsStr1==lhsStr2){
-                    string message = "The '"+lhsStr1+"' object is assigned values twice successively. Perhaps this is a mistake.";
-                    addViolation(lhs1, this, message);
-                }  
-            }
-        }
-    }
+    
 private:
     SourceManager* sm;
-    
 };
 
 static RuleSet rules(new AssignSameVariableTwiceSuccessivelyRule());  
