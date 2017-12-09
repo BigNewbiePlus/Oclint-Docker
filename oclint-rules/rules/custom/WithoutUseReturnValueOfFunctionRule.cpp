@@ -1,6 +1,5 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
-#include <fstream>
 using namespace std;
 using namespace clang;
 using namespace oclint;
@@ -85,7 +84,6 @@ public:
         for(clang::CompoundStmt::body_iterator body_it = compoundStmt->body_begin(); body_it!=compoundStmt->body_end();body_it++){
             Stmt* stmt = *body_it;
             checkStmt(stmt);
-            
         }
         return true;
     }
@@ -93,11 +91,11 @@ private:
     void checkStmt(Stmt* stmt){
         
         FunctionDecl* funcDecl = NULL;
-        if(isa<CXXMemberCallExpr>(stmt)){
+        if(stmt && isa<CXXMemberCallExpr>(stmt)){
                 CXXMemberCallExpr* cxxMemberCallExpr = dyn_cast_or_null<CXXMemberCallExpr>(stmt);
                 funcDecl = cxxMemberCallExpr->getDirectCallee();   
             
-        }else if(isa<CallExpr>(stmt)){
+        }else if(stmt && isa<CallExpr>(stmt)){
             CallExpr* callExpr = dyn_cast_or_null<CallExpr>(stmt);
             funcDecl = callExpr->getDirectCallee();
         }

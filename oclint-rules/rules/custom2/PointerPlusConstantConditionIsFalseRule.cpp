@@ -93,26 +93,26 @@ public:
     /* Visit Cond */
     void VisitCondExpr(Expr* cond){
         Expr* rawCond = cond;
-        if(isa<BinaryOperator>(cond)){
+        if(cond && isa<BinaryOperator>(cond)){
             BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(cond);
             BinaryOperatorKind bok = bo->getOpcode();
             Expr* lhs = bo->getLHS();
             Expr* rhs = bo->getRHS();
-            if((bok==BO_EQ || bok==BO_NE) && lhs->getType()->isPointerType() && isZeroLiteral(rhs)){
+            if((bok==BO_EQ || bok==BO_NE) && lhs && rhs && lhs->getType()->isPointerType() && isZeroLiteral(rhs)){
                 cond = lhs;
             }else
                 return;
         }
-        if(isa<ImplicitCastExpr>(cond)){
+        if(cond && isa<ImplicitCastExpr>(cond)){
             ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(cond);
             cond = ice->getSubExpr();
         }
-        if(isa<BinaryOperator>(cond)){
+        if(cond && isa<BinaryOperator>(cond)){
             BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(cond);
             BinaryOperatorKind bok = bo->getOpcode();
             Expr* lhs = bo->getLHS();
             Expr* rhs = bo->getRHS();
-            if(bok==BO_Add && lhs->getType()->isPointerType() && isa<IntegerLiteral>(rhs)){
+            if(bok==BO_Add && lhs && rhs && lhs->getType()->isPointerType() && isa<IntegerLiteral>(rhs)){
                 string message = "The condition "+expr2str(rawCond)+" is only false if there is pointer overflow which is undefined behaviour anyway.";
                 addViolation(rawCond, this, message);
             }

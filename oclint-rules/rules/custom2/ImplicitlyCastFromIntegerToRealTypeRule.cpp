@@ -85,14 +85,14 @@ public:
     /* Visit ImplicitCastExpr */
     bool VisitImplicitCastExpr(ImplicitCastExpr *ice)
     {
-        if(ice->getType()->isFloatingType()){
+        if(ice && ice->getType()->isFloatingType()){
             Expr* expr = ice->getSubExpr();
-            if(!expr->getType()->isIntegerType())return true;
-            if(isa<ParenExpr>(expr)){
+            if(expr && !expr->getType()->isIntegerType())return true;
+            if(expr && isa<ParenExpr>(expr)){
                 ParenExpr* pe = dyn_cast_or_null<ParenExpr>(expr);
                 expr = pe->getSubExpr();
             }
-            if(isa<BinaryOperator>(expr)){
+            if(expr && isa<BinaryOperator>(expr)){
                 BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(expr);
                 if(bo->getOpcode()==BO_Div){    
                     string message = "The '"+expr2str(expr)+"' expression was implicitly cast from 'int' type to 'double' type. Consider utilizing an explicit type cast to avoid the loss of a fractional part. An example: double A = (double)(X) / Y;";

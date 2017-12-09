@@ -84,10 +84,10 @@ public:
     {
         if(binaryOperator->getOpcode()==BO_Assign){
             Expr* rhs = binaryOperator->getRHS();
-            if(isa<ImplicitCastExpr>(rhs)){
+            if(rhs && isa<ImplicitCastExpr>(rhs)){
                 ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(rhs);
                 Expr* subExpr = implicitCastExpr->getSubExpr();
-                if(isa<BinaryOperator>(subExpr)){
+                if(subExpr && isa<BinaryOperator>(subExpr)){
                     BinaryOperator* rbo = dyn_cast_or_null<BinaryOperator>(subExpr);
                     BinaryOperatorKind bok = rbo->getOpcode();
                     if(bok==BO_GT || bok==BO_LT || bok==BO_GE || bok==BO_LE || bok==BO_EQ || bok==BO_NE){

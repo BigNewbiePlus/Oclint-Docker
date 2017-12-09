@@ -82,6 +82,7 @@ public:
     virtual void tearDown() override {}
 
     bool isOwnlessExpression(Stmt* stmt){
+        if(!stmt)return false;
         if(isa<MemberExpr>(stmt))return true;
         if(isa<UnaryOperator>(stmt)){
             UnaryOperator* uo = dyn_cast_or_null<UnaryOperator>(stmt);

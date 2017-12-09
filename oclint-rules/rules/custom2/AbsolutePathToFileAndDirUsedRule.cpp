@@ -82,14 +82,14 @@ public:
     /* Visit CallExpr */
     bool VisitCallExpr(CallExpr *callExpr)
     {
-        string funName = callExpr->getDirectCallee()->getNameInfo().getAsString();
-        if(funName=="fopen"){
+        FunctionDecl* fd = callExpr->getDirectCallee();
+        if(fd && fd->getNameInfo().getAsString()=="fopen" && callExpr->getNumArgs()>=1){
             Expr* expr = callExpr->getArg(0);
-            while(isa<ImplicitCastExpr>(expr)){
+            while(expr && isa<ImplicitCastExpr>(expr)){
                 ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
                 expr = ice->getSubExpr();
             }
-            if(isa<StringLiteral>(expr)){
+            if(expr && isa<StringLiteral>(expr)){
                 StringLiteral* sl = dyn_cast_or_null<StringLiteral>(expr);
                 string path = sl->getString().str();
                 if(path.find(":")!=string::npos){

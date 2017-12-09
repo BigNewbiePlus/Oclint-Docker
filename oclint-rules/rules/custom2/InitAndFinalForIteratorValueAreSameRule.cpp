@@ -83,24 +83,26 @@ public:
     virtual void tearDown() override {}
 
     string getInitValue(Stmt* init){
+        if(!init)return "";
         if(isa<BinaryOperator>(init)){
             BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(init);
             return expr2str(bo->getRHS());
         }else if(isa<ExprWithCleanups>(init)){
             ExprWithCleanups* ewc =dyn_cast_or_null<ExprWithCleanups>(init);
             init = ewc->getSubExpr();
-            if(isa<CXXOperatorCallExpr>(init)){
+            if(init && isa<CXXOperatorCallExpr>(init)){
                 CXXOperatorCallExpr* coce = dyn_cast_or_null<CXXOperatorCallExpr>(init);
-                return expr2str(coce->getArg(1));
+                if(coce->getNumArgs()>=2)
+                    return expr2str(coce->getArg(1));
             }
         }
         else if(isa<DeclStmt>(init)){
             DeclStmt* ds = dyn_cast_or_null<DeclStmt>(init);
-            if(ds->isSingleDecl()){
+            if(ds && ds->isSingleDecl()){
                 Decl* decl = ds->getSingleDecl();
-                if(isa<VarDecl>(decl)){
+                if(decl && isa<VarDecl>(decl)){
                     VarDecl* varDecl = dyn_cast_or_null<VarDecl>(decl);
-                    if(varDecl->hasInit()){
+                    if(varDecl && varDecl->hasInit()){
                         return expr2str(varDecl->getInit());
                     }
                 }

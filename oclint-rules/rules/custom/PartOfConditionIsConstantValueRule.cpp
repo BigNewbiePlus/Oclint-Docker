@@ -108,19 +108,16 @@ private:
 
     void checkConstant(Expr* expr)
     {
-        while(true){
+        while(expr){
             if(isa<UnaryOperator>(expr)){
                 UnaryOperator* unaryOperator = dyn_cast<UnaryOperator>(expr);
                 expr = unaryOperator->getSubExpr();
             }else if(isa<ImplicitCastExpr>(expr)){
                 ImplicitCastExpr* implicitCastExpr = dyn_cast<ImplicitCastExpr>(expr);
                 expr = implicitCastExpr->getSubExpr();
-                
-                
             }else if(isa<ParenExpr>(expr)){
                 ParenExpr* parenExpr = dyn_cast<ParenExpr>(expr);
                 expr = parenExpr->getSubExpr();
-                
             }else if(isa<BinaryOperator>(expr)){
                 BinaryOperator* binaryOperator = dyn_cast<BinaryOperator>(expr);
                 BinaryOperatorKind bok = binaryOperator->getOpcode();

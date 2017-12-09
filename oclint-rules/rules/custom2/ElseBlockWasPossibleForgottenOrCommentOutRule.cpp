@@ -84,19 +84,18 @@ public:
     /* Visit IfStmt */
     bool VisitIfStmt(IfStmt *is)
     {
-        if(!is->getElse())return true;
         Stmt* then = is->getThen();
         Stmt* els = is->getElse();
 
-        SourceLocation thenEnd   = then->getLocEnd();
-        SourceLocation elsStart  = els->getLocStart();
-        unsigned row1 = sm->getPresumedLineNumber(thenEnd);
-        unsigned col1 = sm->getPresumedColumnNumber(thenEnd);
-        unsigned row2 = sm->getPresumedLineNumber(elsStart);
-        unsigned col2 = sm->getPresumedColumnNumber(elsStart);
-        if(row2-row1>=2){
-            string message = "It is possible that 'else' block was forgotten or commented out, thus altering the program's operation logics.";
-            addViolation(is, this, message);
+        if(then && els){
+            SourceLocation thenEnd   = then->getLocEnd();
+            SourceLocation elsStart  = els->getLocStart();
+            unsigned row1 = sm->getPresumedLineNumber(thenEnd);
+            unsigned row2 = sm->getPresumedLineNumber(elsStart);
+            if(row2-row1>=2){
+                string message = "It is possible that 'else' block was forgotten or commented out, thus altering the program's operation logics.";
+                addViolation(is, this, message);
+            }
         }
         return true;
     }

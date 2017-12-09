@@ -82,14 +82,14 @@ public:
     /* Visit CallExpr */
     bool VisitCallExpr(CallExpr *callExpr)
     {
-        string funName = callExpr->getDirectCallee()->getNameInfo().getAsString();
-        if(funName=="memset" && callExpr->getNumArgs()==3){//memset函数，第三个参数表示设置内存大小，如果是0存在问题
+        FunctionDecl* fd = callExpr->getDirectCallee();
+        if(fd && fd->getNameInfo().getAsString()=="memset" && callExpr->getNumArgs()==3){//memset函数，第三个参数表示设置内存大小，如果是0存在问题
             Expr* arg3 = callExpr->getArg(2); //获取第3个参数
-            if(isa<ImplicitCastExpr>(arg3)){
+            if(arg3 && isa<ImplicitCastExpr>(arg3)){
                 ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(arg3);
                 arg3 = ice->getSubExpr();
             }
-            if(isa<IntegerLiteral>(arg3)){
+            if(arg3 && isa<IntegerLiteral>(arg3)){
                 IntegerLiteral* integerLiteral = dyn_cast_or_null<IntegerLiteral>(arg3);
                 if(integerLiteral->getValue().getSExtValue()==0){
                     string message = "The 'memset' function processes '0' elements. Inspect the third argument.";

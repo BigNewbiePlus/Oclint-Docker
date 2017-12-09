@@ -95,22 +95,22 @@ public:
     bool VisitIfStmt(IfStmt *is)
     {
         Expr* expr = is->getCond();
-        if(isa<UnaryOperator>(expr)){
+        if(expr && isa<UnaryOperator>(expr)){
             UnaryOperator* uo = dyn_cast_or_null<UnaryOperator>(expr);
             if(uo->getOpcode()==UO_LNot){
                 expr = uo->getSubExpr();
                 expr = rmICE(expr);
-                if(isa<CXXThisExpr>(expr)){
+                if(expr && isa<CXXThisExpr>(expr)){
                     string message = "'"+expr2str(is->getCond())+"' comparison should be avoided - this comparison is always false on newer compilers.";
                     addViolation(is->getCond(), this, message);
                 }
             }
-        }else if(isa<BinaryOperator>(expr)){
+        }else if(expr && isa<BinaryOperator>(expr)){
             BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(expr);
             Expr* lhs = bo->getLHS();
-            if(isa<CXXThisExpr>(lhs)){
+            if(lhs && isa<CXXThisExpr>(lhs)){
                 Expr* rhs = rmICE(bo->getRHS());
-                if(isa<IntegerLiteral>(rhs) || isa<GNUNullExpr>(rhs)){
+                if(rhs && (isa<IntegerLiteral>(rhs) || isa<GNUNullExpr>(rhs))){
                     string message = "'"+expr2str(bo)+"' comparison should be avoided - this comparison is always false on newer compilers.";
                     addViolation(bo, this, message);
                 }

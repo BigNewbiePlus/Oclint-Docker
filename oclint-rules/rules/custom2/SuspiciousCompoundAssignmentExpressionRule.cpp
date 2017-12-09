@@ -80,16 +80,16 @@ public:
     virtual void tearDown() override {}
 
     string getDeclRefExprName(Expr* expr){
-        if(isa<BinaryOperator>(expr)){
+        if(expr && isa<BinaryOperator>(expr)){
             BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(expr);
             expr = bo->getLHS();
         }
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
                 ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
                 expr = ice->getSubExpr();
         }
         
-        if(isa<DeclRefExpr>(expr)){
+        if(expr && isa<DeclRefExpr>(expr)){
             DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(expr);
             return dre->getNameInfo().getAsString();
         }
@@ -102,7 +102,7 @@ public:
         Expr* rhs = cso->getRHS();
         string name1 = getDeclRefExprName(lhs);
         string name2 = getDeclRefExprName(rhs);
-        if(name1==name2){
+        if(name1.size() && name2.size() && name1==name2){
             string message = "A compound assignment expression 'X += X + N' is suspicious. Consider inspecting it for a possible error.";
             addViolation(cso, this, message);
         }

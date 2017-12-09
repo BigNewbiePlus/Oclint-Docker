@@ -84,7 +84,7 @@ public:
     {
         if(unaryOperator->getOpcode()==UO_Deref){
             Expr* expr = unaryOperator->getSubExpr();
-            if(isa<UnaryOperator>(expr)){
+            if(expr && isa<UnaryOperator>(expr)){
                 unaryOperator = dyn_cast<UnaryOperator>(expr);
                 UnaryOperatorKind uok = unaryOperator->getOpcode();
                 if(uok==UO_PostInc || uok==UO_PostDec){

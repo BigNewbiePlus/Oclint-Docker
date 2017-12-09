@@ -83,7 +83,7 @@ public:
     virtual void tearDown() override {}
     
     void getOperandName(Expr* expr, vector<string>& operandNames){
-        if(isa<BinaryOperator>(expr)){
+        if(expr && isa<BinaryOperator>(expr)){
             BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(expr);
             BinaryOperatorKind bok = binaryOperator->getOpcode();
             if(bok==BO_Add){
@@ -100,7 +100,7 @@ public:
     bool VisitIfStmt(IfStmt *ifStmt)
     {
         Expr* expr = ifStmt->getCond();
-        if(isa<BinaryOperator>(expr)){
+        if(expr && isa<BinaryOperator>(expr)){
             BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(expr);
             BinaryOperatorKind bok = binaryOperator->getOpcode();
             if(bok==BO_LT || bok==BO_GT || bok==BO_LE || bok==BO_GE || bok==BO_EQ || bok==BO_NE){

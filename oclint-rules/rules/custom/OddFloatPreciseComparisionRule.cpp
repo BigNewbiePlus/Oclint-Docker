@@ -82,23 +82,23 @@ public:
     }
     virtual void tearDown() override {}
     /* Visit BinaryOperator */
-    bool VisitBinaryOperator(BinaryOperator *binaryOperator)
+    bool VisitBinaryOperator(BinaryOperator *bo)
     {
         
-        BinaryOperatorKind bok = binaryOperator->getOpcode();
+        BinaryOperatorKind bok = bo->getOpcode();
         if(bok==BO_EQ || bok==BO_NE){
             
-            Expr* lhs = binaryOperator->getLHS();
-            Expr* rhs = binaryOperator->getRHS();
+            Expr* lhs = bo->getLHS();
+            Expr* rhs = bo->getRHS();
             
             bool isfloat1 = lhs->getType()->isFloatingType();
             bool isfloat2 = rhs->getType()->isFloatingType();
             
             if(isfloat1 && isfloat2)
             {
-                string message = "An odd precise comparison: "+expr2str(binaryOperator)
+                string message = "An odd precise comparison: "+expr2str(bo)
                 +". It's probably better to use a comparison with defined precision: fabs(A - B) '<' Epsilon.";
-                addViolation(binaryOperator, this, message);
+                addViolation(bo, this, message);
             }    
         }
         return true;

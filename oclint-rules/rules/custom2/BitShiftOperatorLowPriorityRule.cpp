@@ -80,7 +80,7 @@ public:
     virtual void tearDown() override {}
 
     bool isSimpleOperator(Expr* expr, string& simpOp){
-        if(isa<BinaryOperator>(expr)){
+        if(expr && isa<BinaryOperator>(expr)){
             BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(expr);
             BinaryOperatorKind bok = bo->getOpcode();
             if(bok==BO_Add || bok==BO_Sub || bok==BO_Mul || bok==BO_Div){

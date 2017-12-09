@@ -82,6 +82,7 @@ public:
     bool VisitForStmt(ForStmt *parentStmt)
     {
         Stmt *bodyStmt = parentStmt->getBody();
+        if(!bodyStmt)return true;
         ForStmt *forStmt = dyn_cast_or_null<ForStmt>(bodyStmt);
         CompoundStmt *compoundStmt = dyn_cast_or_null<CompoundStmt>(bodyStmt);
         if (!forStmt && compoundStmt && compoundStmt->size() == 1)
@@ -96,8 +97,7 @@ public:
             if (isInnerIncMatchingOuterInit(condExpr, initStmt, name))
             {
                 
-                string message = 
-                    "It is likely that a wrong variable is being compared inside the 'for' operator. Consider reviewing '"+name+"'.";
+                string message = "It is likely that a wrong variable is being compared inside the 'for' operator. Consider reviewing '"+name+"'.";
                 addViolation(condExpr, this, message);
             }
         }
@@ -108,31 +108,32 @@ public:
 private:
     VarDecl *varDeclFromInitStmt(Stmt *initStmt)
     {
+        if(!initStmt)return NULL;
         DeclStmt *declStmt = dyn_cast_or_null<DeclStmt>(initStmt);
         if (declStmt && declStmt->isSingleDecl())
         {
             return dyn_cast_or_null<VarDecl>(declStmt->getSingleDecl());
         }
-        return nullptr;
+        return NULL;
     }
 
     ValueDecl *valueDeclFromCondExpr(Expr *expr)
     {
-        if(isa<BinaryOperator>(expr)){
+        if(expr && isa<BinaryOperator>(expr)){
             BinaryOperator* binaryOperator = dyn_cast<BinaryOperator>(expr);
             if(binaryOperator->getOpcode()==BO_LT){
                 expr = binaryOperator->getLHS();
-                if(isa<ImplicitCastExpr>(expr)){
+                if(expr && isa<ImplicitCastExpr>(expr)){
                     auto implicitCastExpr = dyn_cast<ImplicitCastExpr>(expr);
                     expr = implicitCastExpr->getSubExpr();
                 }
-                if(isa<DeclRefExpr>(expr)){
+                if(expr && isa<DeclRefExpr>(expr)){
                     DeclRefExpr *declRefExpr = dyn_cast<DeclRefExpr>(expr);
                     return declRefExpr->getDecl(); 
                 }
             }
         }
-        return nullptr;
+        return NULL;
     }
 
     bool isInnerIncMatchingOuterInit(Expr *condExpr, Stmt *initStmt,string& name)

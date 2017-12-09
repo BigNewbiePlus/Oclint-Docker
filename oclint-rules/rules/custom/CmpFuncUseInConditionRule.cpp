@@ -82,7 +82,7 @@ public:
     bool VisitIfStmt(IfStmt *ifStmt)
     {
         Expr* expr = ifStmt->getCond();
-        CallExpr* callExpr = getCmpExprName(expr);
+        CallExpr* callExpr = getCmpExpr(expr);
         if(callExpr){
             string name = callExpr->getDirectCallee()->getNameInfo().getAsString();
             string message = "The '"+name+"' function returns 0 if corresponding strings are equal. Consider examining the condition for mistakes.";
@@ -102,8 +102,8 @@ private:
                 BinaryOperatorKind bok = bo->getOpcode();
             
                 if(bok==BO_LAnd||bok==BO_LOr){
-                    callExpr = getCmpExpr(binaryOperator->getLHS());
-                    if(!callExpr) callExpr = getTheCmpExpr(binaryOperator->getRHS());
+                    callExpr = getCmpExpr(bo->getLHS());
+                    if(!callExpr) callExpr = getCmpExpr(bo->getRHS());
                 }
                 break;
         

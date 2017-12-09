@@ -82,11 +82,8 @@ public:
     /* Visit CallExpr */
     bool VisitCallExpr(CallExpr *callExpr)
     {
-        string name = callExpr->getDirectCallee()->getNameInfo().getAsString();
-        if(name!="sprintf")return true;
-        
-        int num = callExpr->getNumArgs();
-        if(num>2){
+        FunctionDecl* fd = callExpr->getDirectCallee();
+        if(fd && fd->getNameInfo().getAsString()=="sprintf" && callExpr->getNumArgs()>=3){
             string varName;
             if(refSamePointerVar(callExpr->getArg(0),callExpr->getArg(2), varName)){
                 string message = "It is dangerous to print the string '"+varName+"' into itself.";
@@ -100,12 +97,12 @@ public:
 private:
     ValueDecl* getValueDecl(Expr* expr){
         if(expr && isa<ImplicitCastExpr>(expr)){
-            ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
-            expr = implicitCastExpr->getSubExpr();
+            ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
+            expr = ice->getSubExpr();
         }
         if(expr && isa<DeclRefExpr>(expr)){
-            DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(expr);
-            return declRefExpr->getDecl();
+            DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(expr);
+            return dre->getDecl();
         }
         return NULL;
     }

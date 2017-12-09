@@ -87,7 +87,7 @@ public:
     {
         Expr* trueExpr = conditionalOperator->getTrueExpr();
         Expr* falseExpr = conditionalOperator->getFalseExpr();
-        if(expr2str(trueExpr) == expr2str(falseExpr)){
+        if(trueExpr && falseExpr && expr2str(trueExpr) == expr2str(falseExpr)){
             string message = "The '?:' operator, regardless of its conditional expression, always returns one and the same value.";
             addViolation(conditionalOperator, this, message);
         }

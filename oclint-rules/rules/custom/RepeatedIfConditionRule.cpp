@@ -1,7 +1,7 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
 #include "clang/Lex/Lexer.h"
-
+#include<set>
 using namespace std;
 using namespace clang;
 using namespace oclint;
@@ -86,27 +86,24 @@ public:
     bool VisitIfStmt(IfStmt *ifStmt)
     {
         IfStmt* origIfStmt = ifStmt;
-        vector<string> conditions;
+        set<string> conditions;
         while(ifStmt){
             Expr* condExpr = ifStmt->getCond();
+            if(!condExpr)break;
             string condition = expr2str(condExpr);
-            conditions.push_back(condition);
+            if(conditions.find(condition)!=conditions.end()){
+                
+                string message = "The use of 'if (A) {...} else if (A) {...}' pattern was detected. There is a probability of logical error presence.";
+                addViolation(origIfStmt, this, message);
+                break;
+            }
+            conditions.insert(condition);
             Stmt* elseStmt = ifStmt->getElse();
             if(elseStmt && isa<IfStmt>(elseStmt)){
                ifStmt = dyn_cast_or_null<IfStmt>(elseStmt);
             }else
                 break;
             
-        }
-        
-        for(int i=0;i<conditions.size()-1;i++){
-            for(int j=i+1;j<conditions.size();j++){
-                if(conditions[i]==conditions[j]){
-                    string message = "The use of 'if (A) {...} else if (A) {...}' pattern was detected. There is a probability of logical error presence.";
-                    addViolation(origIfStmt, this, message);
-                    return true;
-                }
-            }
         }
         
         return true;

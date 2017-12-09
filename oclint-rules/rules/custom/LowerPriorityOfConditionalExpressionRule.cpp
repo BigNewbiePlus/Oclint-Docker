@@ -1,6 +1,5 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
-#include<fstream>
 using namespace std;
 using namespace clang;
 using namespace oclint;
@@ -87,20 +86,18 @@ public:
     bool VisitConditionalOperator(ConditionalOperator *node)
     {
         Expr* condExpr = node->getCond();
-        if(isa<ImplicitCastExpr>(condExpr)){
+        if(condExpr && isa<ImplicitCastExpr>(condExpr)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(condExpr);
             condExpr = implicitCastExpr->getSubExpr();
         }
-        if(isa<BinaryOperator>(condExpr)){//条件表达式条件是二元是，可能存在优先级问题
+        if(condExpr && isa<BinaryOperator>(condExpr)){//条件表达式条件是二元是，可能存在优先级问题
             BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(condExpr);
             string opcStr = binaryOperator->getOpcodeStr();
             string message = "Perhaps the '?:' operator works in a different way than it was expected.The '?:' operator has a lower priority than the '"+opcStr+"' operator.";
-            
             addViolation(node, this, message);
         }
         return true;
     }
-private:
 
 };
 

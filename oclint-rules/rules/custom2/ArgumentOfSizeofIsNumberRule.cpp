@@ -82,13 +82,13 @@ public:
     /* Visit UnaryExprOrTypeTraitExpr */
     bool VisitUnaryExprOrTypeTraitExpr(UnaryExprOrTypeTraitExpr *uett)
     {
-        if(uett->getKind()==UETT_SizeOf){
+        if(uett && uett->getKind()==UETT_SizeOf){
             Expr* expr = uett->getArgumentExpr();
-            if(isa<ParenExpr>(expr)){
+            if(expr && isa<ParenExpr>(expr)){
                 ParenExpr* pe= dyn_cast_or_null<ParenExpr>(expr);
                 expr = pe->getSubExpr();
             }
-            if(isa<IntegerLiteral>(expr)){
+            if(expr && isa<IntegerLiteral>(expr)){
                 string message = "Consider inspecting the expression. The argument of sizeof() is the macro which expands to a number.";
                 addViolation(uett, this, message);
             }

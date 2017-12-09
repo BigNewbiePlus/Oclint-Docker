@@ -83,15 +83,15 @@ public:
     virtual void tearDown() override {}
 
     bool isInteger(Expr* expr){
-        while(isa<ImplicitCastExpr>(expr)){
+        while(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr = ice->getSubExpr();
         }
-        return expr->getType()->isIntegerType();
+        return expr && expr->getType()->isIntegerType();
     }
 
-    bool isFloat(Expr* expr){
-        return isa<FloatingLiteral>(expr);
+    inline bool isFloat(Expr* expr){
+        return expr && isa<FloatingLiteral>(expr);
     }
     /* Visit BinaryOperator */
     bool VisitBinaryOperator(BinaryOperator *node)
@@ -102,6 +102,7 @@ public:
         }
         return true;
     }
+
     string expr2str(Expr* expr){
         // (T, U) => "T,,"
         string text = clang::Lexer::getSourceText(

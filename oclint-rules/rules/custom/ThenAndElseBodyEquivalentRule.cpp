@@ -84,9 +84,9 @@ public:
     /* Visit IfStmt */
     bool VisitIfStmt(IfStmt *ifStmt)
     {
-        if(ifStmt->getElse()){
-            Stmt* then = ifStmt->getThen();
-            Stmt* els  = ifStmt->getElse();
+        Stmt* then = ifStmt->getThen();
+        Stmt* els  = ifStmt->getElse();
+        if(then && els){
             if(stmt2str(then)==stmt2str(els)){
                 addViolation(ifStmt, this, "The 'then' statement is equivalent to the 'else' statement.");
             }

@@ -82,12 +82,12 @@ public:
     }
     virtual void tearDown() override {}
 
-    int varDeclType(VarDecl* varDecl){
-        if(varDecl->hasInit()){
-            Expr* init = varDecl->getInit();
-            if(isa<CXXNewExpr>(init)){
+    int varDeclType(VarDecl* vd){
+        if(vd && vd->hasInit()){
+            Expr* init = vd->getInit();
+            if(init && isa<CXXNewExpr>(init)){
                 CXXNewExpr* cne = dyn_cast_or_null<CXXNewExpr>(init);
-                if(cne->isArray())return 2;
+                if(cne && cne->isArray())return 2;
                 else return 1;
             }
         }

@@ -82,19 +82,15 @@ public:
     /* Visit BinaryOperator*/
     bool VisitBinaryOperator(BinaryOperator *node)
     {
-        string opcStr = node->getOpcodeStr();
+        BinaryOperatorKind bok = node->getOpcode();
         Expr* lhs = node->getLHS();
         Expr* rhs = node->getRHS();
-        if(opcStr==">" || opcStr=="<" || opcStr==">=" || opcStr=="<="){
-            if(isPointer(lhs)||isPointer(rhs)){
+        if(bok==BO_GT || bok==BO_LT || bok==BO_GE || bok==BO_LE){
+            if((lhs && lhs->getType()->isPointerType())||(rhs && rhs->getType()->isPointerType())){
                 addViolation(node, this, "NonSensicalPointerComparison!");
             }
         }
         return true;
-    }
-private:
-    bool isPointer(Expr* expr){
-        return expr->getType()->isPointerType();
     }
     
 };

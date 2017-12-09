@@ -93,11 +93,13 @@ public:
     /* Visit CompoundStmt */
     bool VisitCompoundStmt(CompoundStmt *cs)
     {
+        if(cs->size()<2)return true;
+        
         for(CompoundStmt::body_iterator it=cs->body_begin(); it!=cs->body_end();it++){
             if(isa<IfStmt>(*it)){
                 IfStmt* ifStmt = dyn_cast_or_null<IfStmt>(*it);
                 Stmt* then = ifStmt->getThen();
-                if(!ifStmt->getElse() && !isa<CompoundStmt>(then) && (it+1!=cs->body_end())){//if语句没else分支且then无括号
+                if(then && !ifStmt->getElse() && !isa<CompoundStmt>(then) && (it+1!=cs->body_end())){//if语句没else分支且then无括号
                     Stmt* nextStmt = *(it+1);
                     if(isSameFormat(then, nextStmt)){
                         string message= "The code's operational logic does not correspond with its formatting. The statement is indented to the right, but it is always executed. It is possible that curly brackets are missing.";

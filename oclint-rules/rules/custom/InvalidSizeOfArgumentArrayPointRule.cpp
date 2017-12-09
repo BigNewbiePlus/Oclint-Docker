@@ -86,16 +86,16 @@ public:
     {
         if(node->getKind()==UETT_SizeOf){
             Expr* expr = node->getArgumentExpr();
-            if(isa<ParenExpr>(expr)){
+            if(expr && isa<ParenExpr>(expr)){
                 ParenExpr* parenExpr = dyn_cast_or_null<ParenExpr>(expr);
                 expr= parenExpr->getSubExpr();
             }
-            if(isa<DeclRefExpr>(expr)){
+            if(expr && isa<DeclRefExpr>(expr)){
                 DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(expr);
                 ValueDecl* valueDecl = declRefExpr->getDecl();
-                if(isa<ParmVarDecl>(valueDecl)){
+                if(valueDecl && isa<ParmVarDecl>(valueDecl)){
                     ParmVarDecl* parmVarDecl = dyn_cast_or_null<ParmVarDecl>(valueDecl);
-                    if(parmVarDecl->getOriginalType()->isArrayType()){
+                    if(parmVarDecl && parmVarDecl->getOriginalType()->isArrayType()){
                         string sizeofStr = expr2str(node);
                         string message = 
                             "The sizeof() operator returns size of the pointer, and not of the array, in '"+sizeofStr+"' expression.";

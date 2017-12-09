@@ -80,11 +80,10 @@ public:
     virtual void tearDown() override {}
 
     bool hasReturnStmt(Stmt* stmt){
-        if(isa<CompoundStmt>(stmt)){
+        if(stmt && isa<CompoundStmt>(stmt)){
             CompoundStmt* compoundStmt = dyn_cast_or_null<CompoundStmt>(stmt);
             for(CompoundStmt::body_iterator it=compoundStmt->body_begin(); it!=compoundStmt->body_end(); it++){
-                if(isa<ReturnStmt>(*it))
-                    return true;
+                if(isa<ReturnStmt>(*it))return true;
             }    
         }
         return false;

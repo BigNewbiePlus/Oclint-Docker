@@ -83,19 +83,19 @@ public:
     virtual void tearDown() override {}
 
     bool isArrayPoint(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr = ice->getSubExpr();
         }
-        return expr->getType()->isArrayType();
+        return expr && expr->getType()->isArrayType();
     }
 
     bool isZeroInteger(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr = ice->getSubExpr();
         }
-        if(isa<IntegerLiteral>(expr)){
+        if(expr && isa<IntegerLiteral>(expr)){
             IntegerLiteral* il = dyn_cast_or_null<IntegerLiteral>(expr);
             return il->getValue().getSExtValue()==0;
         }

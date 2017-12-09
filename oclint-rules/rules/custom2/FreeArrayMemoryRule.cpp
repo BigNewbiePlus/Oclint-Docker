@@ -94,8 +94,8 @@ public:
     /* Visit CallExpr */
     bool VisitCallExpr(CallExpr *ce)
     {
-        string funName = ce->getDirectCallee()->getNameInfo().getAsString();
-        if(funName=="free" && ce->getNumArgs()==1){
+        FunctionDecl* fd = ce->getDirectCallee();
+        if(fd && fd->getNameInfo().getAsString()=="free" && ce->getNumArgs()==1){
             if(isArrayArg(ce->getArg(0))){
                 string message = "An attempt to free memory containing the 'int A[10]' array by using the 'free(A)' function.";
                 addViolation(ce, this, message);

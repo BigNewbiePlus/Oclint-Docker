@@ -81,7 +81,7 @@ public:
 
     inline Expr* rmICE(Expr* expr){
             
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr = ice->getSubExpr();
         }
@@ -93,7 +93,7 @@ public:
         if(bo->getOpcode()==BO_EQ){
             Expr* lhs = bo->getLHS();
             lhs = rmICE(lhs);
-            if(isa<BinaryOperator>(lhs)){
+            if(lhs && isa<BinaryOperator>(lhs)){
                 BinaryOperator* bo2 = dyn_cast_or_null<BinaryOperator>(lhs);
                 if(bo2->getOpcode()==BO_EQ){
                     string message = "Suspicious comparison found: 'a == b == c'. Remember that 'a == b == c' is not equal to 'a == b && b == c'.";

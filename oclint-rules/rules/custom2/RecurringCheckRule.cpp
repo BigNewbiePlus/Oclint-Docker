@@ -84,6 +84,7 @@ public:
 
     //check whether the stmt contain the same condtion of expr
     bool recurCheck(string condStr, Stmt* then){
+        if(!then) return false;
         if(isa<CompoundStmt>(then)){
             CompoundStmt* compoundStmt = dyn_cast_or_null<CompoundStmt>(then);
             for(CompoundStmt::body_iterator it=compoundStmt->body_begin(); it!=compoundStmt->body_end(); it++){
@@ -108,11 +109,12 @@ public:
     {
         Expr* expr= ifStmt->getCond();
         Stmt* then = ifStmt->getThen();
-        string condStr = expr2str(expr);
-
-        if(recurCheck(condStr, then)){
-            string message = "Recurring check. The IF Condition '"+condStr+"' check twice.";
-            addViolation(ifStmt, this, message);
+        if(expr && then){
+            string condStr = expr2str(expr);
+            if(recurCheck(condStr, then)){
+                string message = "Recurring check. The IF Condition '"+condStr+"' check twice.";
+                addViolation(ifStmt, this, message);
+            }
         }
         return true;
     }

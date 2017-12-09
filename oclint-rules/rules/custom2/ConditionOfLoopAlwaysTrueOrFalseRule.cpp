@@ -81,18 +81,18 @@ public:
 
 
     inline string getDeclRefExprName(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr = ice->getSubExpr();
         }
-        if(isa<DeclRefExpr>(expr)){
+        if(expr && isa<DeclRefExpr>(expr)){
             DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(expr);
             return dre->getNameInfo().getAsString();    
         }
         return "";
     }
     string getCondVar(Expr* cond){
-        if(isa<BinaryOperator>(cond)){
+        if(cond && isa<BinaryOperator>(cond)){
             BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(cond);
             BinaryOperatorKind bok = bo->getOpcode();
             if(bok==BO_LT || bok==BO_GT || bok==BO_LE || bok==BO_GE || bok==BO_EQ || bok==BO_NE){
@@ -103,6 +103,8 @@ public:
     }
 
     inline bool hasVarInStmt(Stmt* stmt, string& var){
+        if(!stmt)return false;
+
         if(isa<UnaryOperator>(stmt)){
             UnaryOperator* uo = dyn_cast_or_null<UnaryOperator>(stmt);
             UnaryOperatorKind uok =uo->getOpcode();
@@ -122,7 +124,7 @@ public:
     }
 
     bool hasNoVarInBody(Stmt* stmt, string var){
-        if(isa<CompoundStmt>(stmt)){
+        if(stmt && isa<CompoundStmt>(stmt)){
             CompoundStmt* cs = dyn_cast_or_null<CompoundStmt>(stmt);
             for(CompoundStmt::body_iterator it=cs->body_begin(); it!=cs->body_end(); it++){
                 if(hasVarInStmt(*it, var))return false;
@@ -135,10 +137,12 @@ public:
     {
         Expr* cond = ws->getCond();
         Stmt* body = ws->getBody();
-        string var = getCondVar(cond);
-        if(var.size() && hasNoVarInBody(body, var)){
-            string message = "The condition of loop is always true.";
-            addViolation(ws, this, message);
+        if(cond && body){
+            string var = getCondVar(cond);
+            if(var.size() && hasNoVarInBody(body, var)){
+                string message = "The condition of loop is always true.";
+                addViolation(ws, this, message);
+            }
         }
         return true;
     }

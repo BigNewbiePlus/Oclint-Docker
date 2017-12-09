@@ -93,6 +93,7 @@ public:
     /* Visit InitListExpr */  
     bool VisitInitListExpr(InitListExpr *ile)
     {
+        if(!ile)return true;
         string type = ile->getType().getAsString();
         if(type.find("char *[")!=string::npos){//字符串数组
             for(unsigned i=0;i<ile->getNumInits();i++){

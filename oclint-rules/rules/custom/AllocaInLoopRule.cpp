@@ -136,10 +136,10 @@ public:
             CStyleCastExpr* csce = dyn_cast_or_null<CStyleCastExpr>(rhs);
             rhs = csce->getSubExpr();
             if(rhs&&isa<CallExpr>(rhs)){
-                CallExpr* ce = dyn_cast_or_null<CStyleCastExpr>(rhs);
+                CallExpr* ce = dyn_cast_or_null<CallExpr>(rhs);
                 string funName = ce->getDirectCallee()->getNameInfo().getAsString();
                 if(funName == "__builtin_alloca"){
-                    string message = "The 'alloca' function is used inside the loop. This can quickly overflow stack."
+                    string message = "The 'alloca' function is used inside the loop. This can quickly overflow stack.";
                     addViolation(stmt, this, message);
                 }
             }

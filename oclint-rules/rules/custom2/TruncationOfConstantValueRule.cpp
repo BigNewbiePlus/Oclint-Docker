@@ -1,9 +1,9 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
-#include<sstream>
 using namespace std;
 using namespace clang;
 using namespace oclint;
+#include<sstream>
 
 class TruncationOfConstantValueRule : public AbstractASTVisitorRule<TruncationOfConstantValueRule>
 {
@@ -80,17 +80,17 @@ public:
     virtual void tearDown() override {}
 
     
-    bool isUnsignedCharType(Expr* expr){
-        return expr->getType()->isUnsignedIntegerType();
+    inline bool isUnsignedCharType(Expr* expr){
+        return expr && expr->getType()->isUnsignedIntegerType();
     }
 
     bool isOutOfUnsignedCharValue(Expr* expr, int& value){
         int flag=1;
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr = implicitCastExpr->getSubExpr();
         }
-        if(isa<UnaryOperator>(expr)){
+        if(expr && isa<UnaryOperator>(expr)){
             UnaryOperator* unaryOperator = dyn_cast_or_null<UnaryOperator>(expr);
             UnaryOperatorKind uok = unaryOperator->getOpcode();
             
@@ -100,7 +100,7 @@ public:
             expr = unaryOperator->getSubExpr();
         }
         
-        if(isa<IntegerLiteral>(expr)){
+        if(expr && isa<IntegerLiteral>(expr)){
             IntegerLiteral*  integerLiteral = dyn_cast_or_null<IntegerLiteral>(expr);
             value = integerLiteral->getValue().getSExtValue()*flag;
             if(value<0|| value>255)return true;

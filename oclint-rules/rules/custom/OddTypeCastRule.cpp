@@ -83,7 +83,7 @@ public:
     bool VisitCStyleCastExpr(CStyleCastExpr *node)
     {
         Expr* expr = node->getSubExpr();
-        if(isPointerType(expr) && node->getTypeAsWritten()->isCharType()){
+        if(expr && isPointerType(expr) && node->getTypeAsWritten()->isCharType()){
             addViolation(node,this,"Consider inspecting an odd type cast: 'char *' to 'char'.");
         }
         return true;
@@ -91,13 +91,13 @@ public:
     
 private:
     bool isPointerType(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast<ImplicitCastExpr>(expr);
             expr = implicitCastExpr->getSubExpr();
         }
-        if(isa<DeclRefExpr>(expr)){
-           DeclRefExpr* declRefExpr = dyn_cast<DeclRefExpr>(expr);
-            return declRefExpr->getType()->isPointerType() || declRefExpr->getType()->isArrayType();
+        if(expr && isa<DeclRefExpr>(expr)){
+           DeclRefExpr* dre = dyn_cast<DeclRefExpr>(expr);
+            return dre && (dre->getType()->isPointerType() || dre->getType()->isArrayType());
         }
         return false;
     }

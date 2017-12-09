@@ -83,7 +83,7 @@ public:
     bool VisitParenExpr(ParenExpr *parenExpr)
     {
         Expr* expr = parenExpr->getSubExpr();
-        if(isa<ParenExpr>(expr)){
+        if(expr && isa<ParenExpr>(expr)){
             string message = "The expression was enclosed by parentheses twice: ((expression)). One pair of parentheses is unnecessary or misprint is present.";
             addViolation(parenExpr, this, message);
         }

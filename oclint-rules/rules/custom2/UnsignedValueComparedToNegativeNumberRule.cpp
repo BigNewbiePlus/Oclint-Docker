@@ -93,15 +93,15 @@ public:
     }
 
     bool isNegativeNumber(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
-                ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
-                expr = ice->getSubExpr();
+        if(expr && isa<ImplicitCastExpr>(expr)){
+            ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
+            expr = ice->getSubExpr();
         }
-        if(isa<UnaryOperator>(expr)){
+        if(expr && isa<UnaryOperator>(expr)){
             UnaryOperator* uo = dyn_cast_or_null<UnaryOperator>(expr);
             if(uo->getOpcode()==UO_Minus){
                 expr = uo->getSubExpr();
-                if(isa<IntegerLiteral>(expr))return true;
+                if(expr && isa<IntegerLiteral>(expr))return true;
             }
         }
         return false;

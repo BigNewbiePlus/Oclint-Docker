@@ -99,14 +99,14 @@ public:
     }
 
     Expr* getDeclInit(DeclStmt* ds){
-        if(ds->isSingleDecl()){
+        if(ds && ds->isSingleDecl()){
             Decl* decl = ds->getSingleDecl();
-            if(isa<VarDecl>(decl)){
+            if(decl && isa<VarDecl>(decl)){
                 VarDecl* vd = dyn_cast_or_null<VarDecl>(decl);
                 return vd->getInit();
             }
         }
-        return nullptr;
+        return NULL;
     }
     /* Visit CompoundStmt */
     bool VisitCompoundStmt(CompoundStmt *cs)

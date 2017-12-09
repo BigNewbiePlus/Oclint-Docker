@@ -83,7 +83,7 @@ public:
     {
         if(vd->hasInit() && vd->getType()->isArrayType()){
             Expr* init = vd->getInit();
-            if(isa<InitListExpr>(init)){
+            if(init && isa<InitListExpr>(init)){
                 InitListExpr* ile = dyn_cast_or_null<InitListExpr>(init);
                 if(ile->hasArrayFiller()){
                     string message = "It is possible that ',' comma is missing at the end of the string.";

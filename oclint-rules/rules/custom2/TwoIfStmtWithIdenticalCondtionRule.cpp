@@ -83,6 +83,7 @@ public:
     virtual void tearDown() override {}
 
     bool hasReturnStmt(Stmt* stmt){
+        if(!stmt)return false;
         if(isa<ReturnStmt>(stmt))return true;
         if(isa<CompoundStmt>(stmt)){
             CompoundStmt* cs = dyn_cast_or_null<CompoundStmt>(stmt);
@@ -105,7 +106,7 @@ public:
                     string message = "There are two 'if' statements with identical conditional expressions. The first 'if' statement contains function return. This means that the second 'if' statement is senseless.";
                     addViolation(*it, this, message);
                 }
-                if(hasReturnStmt(is->getThen())){
+                if(is->getThen() && hasReturnStmt(is->getThen())){
                     return_conds.insert(cond);
                 }
 

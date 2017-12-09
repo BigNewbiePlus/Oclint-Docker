@@ -103,24 +103,25 @@ public:
     }
      
     /* Visit SwitchStmt */
-    bool VisitSwitchStmt(SwitchStmt *node)
+    bool VisitSwitchStmt(SwitchStmt *ss)
     {
-        Expr* cond = node->getCond();
+        Expr* cond = ss->getCond();
         string type1 = getEnumType(cond);
         if(type1.size()==0)return true;
         
-        SwitchCase* switchCase = node->getSwitchCaseList();
+        SwitchCase* switchCase = ss->getSwitchCaseList();
         
-        while(switchCase && isa<CaseStmt>(switchCase)){
-                
-            CaseStmt* caseStmt = dyn_cast<CaseStmt>(switchCase);
-            Expr* lhs = caseStmt->getLHS();
-            string type2 = getEnumType(lhs);
+        while(switchCase){
+            if(isa<CaseStmt>(switchCase)){ 
+                CaseStmt* caseStmt = dyn_cast<CaseStmt>(switchCase);
+                Expr* lhs = caseStmt->getLHS();
+                string type2 = getEnumType(lhs);
                 
             
-            if(type2.size()&&type2!=type1){
-                string message = "The values of different enum types are compared: switch(ENUM_TYPE_A) { case ENUM_TYPE_B: ... }.";
-                addViolation(switchCase,this,message);
+                if(type2.size()&&type2!=type1){
+                    string message = "The values of different enum types are compared: switch(ENUM_TYPE_A) { case ENUM_TYPE_B: ... }.";
+                    addViolation(switchCase,this,message);
+                }
             }
             switchCase = switchCase->getNextSwitchCase();
         }
@@ -128,20 +129,19 @@ public:
     }
 private:
     string getEnumType(Expr* expr){
-        string type = "";
         while(expr && isa<ImplicitCastExpr>(expr)){
-            ImplicitCastExpr* implicitCastExpr = dyn_cast<ImplicitCastExpr>(expr);
-            expr = implicitCastExpr->getSubExpr();
+            ImplicitCastExpr* ice = dyn_cast<ImplicitCastExpr>(expr);
+            expr = ice->getSubExpr();
         } 
         
         if(expr && isa<DeclRefExpr>(expr)){
             DeclRefExpr* declRefExpr = dyn_cast<DeclRefExpr>(expr);
             ValueDecl* vd = declRefExpr->getDecl();
             if(vd && vd->getType()->isEnumeralType()){
-              return valueDecl->getType().getAsString();  
+              return vd->getType().getAsString();  
             }
         }
-        return type;
+        return "";
     }
     
     std::string expr2str(Expr* expr) {

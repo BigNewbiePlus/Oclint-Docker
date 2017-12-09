@@ -1,6 +1,5 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
-#include<fstream>
 using namespace std;
 using namespace clang;
 using namespace oclint;
@@ -87,11 +86,11 @@ public:
         if(!isTwoPointer(str))return true;
         Expr* expr = node->getSubExpr();
         
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast<ImplicitCastExpr>(expr);
             expr = implicitCastExpr->getSubExpr();
         }
-        if(isa<DeclRefExpr>(expr)){
+        if(expr && isa<DeclRefExpr>(expr)){
             DeclRefExpr* declRefExpr = dyn_cast<DeclRefExpr>(expr);
             string declType = declRefExpr->getType().getAsString();
             

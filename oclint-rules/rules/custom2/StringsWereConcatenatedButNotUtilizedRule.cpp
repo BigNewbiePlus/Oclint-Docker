@@ -80,12 +80,13 @@ public:
     virtual void tearDown() override {}
 
     bool isConcateOperator(ExprWithCleanups* ewc){
+        if(!ewc)return false;
         Expr* expr = ewc->getSubExpr();
-        if(isa<CXXBindTemporaryExpr>(expr)){
+        if(expr && isa<CXXBindTemporaryExpr>(expr)){
             CXXBindTemporaryExpr* cbte = dyn_cast_or_null<CXXBindTemporaryExpr>(expr);
             expr = cbte->getSubExpr();
         }
-        if(isa<CXXOperatorCallExpr>(expr)){
+        if(expr && isa<CXXOperatorCallExpr>(expr)){
             CXXOperatorCallExpr* cxxCallExpr = dyn_cast_or_null<CXXOperatorCallExpr>(expr);
             string operType = cxxCallExpr->getDirectCallee()->getNameInfo().getAsString();
             if(operType=="operator+")return true;

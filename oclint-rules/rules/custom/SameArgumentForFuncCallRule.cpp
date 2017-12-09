@@ -94,7 +94,7 @@ public:
         string arg1Str = expr2str(arg1);
         string arg2Str = expr2str(arg2);
         
-        if(arg1Str==arg2Str){
+        if(arg1Str.size() && arg1Str==arg2Str){
             string funcName = callExpr->getDirectCallee()->getNameInfo().getAsString();
             string message = "The first argument of '"+funcName+"' function is equal to the second argument.";
             addViolation(callExpr, this, message);

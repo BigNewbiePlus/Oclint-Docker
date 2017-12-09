@@ -98,21 +98,24 @@ public:
     /* Visit WhileStmt */
     bool VisitWhileStmt(WhileStmt *ws)
     {
-        visitBody(ws->getBody());
+        Stmt* body = ws->getBody();
+        if(body)visitBody(body);
         return true;
     }
 
     /* Visit DoStmt */
     bool VisitDoStmt(DoStmt *ds)
     {
-        visitBody(ds->getBody());
+        Stmt* body = ds->getBody();
+        if(body)visitBody(body);
         return true;
     }
 
     /* Visit ForStmt */
     bool VisitForStmt(ForStmt *fs)
     {
-        visitBody(fs->getBody());
+        Stmt* body = fs->getBody();
+        if(body)visitBody(body);
         return true;
     }
 

@@ -79,14 +79,14 @@ public:
     virtual void setUp() override {}
     virtual void tearDown() override {}
     /* Visit CallExpr */
-    bool VisitCallExpr(CallExpr *node)
+    bool VisitCallExpr(CallExpr *callExpr)
     {
-        FunctionDecl* funcDecl = node->getDirectCallee();
-        int argNums = node->getNumArgs();
+        FunctionDecl* funcDecl = callExpr->getDirectCallee();
+        if(!funcDecl)return true;
         string funcName = funcDecl->getNameInfo().getAsString();
-        if(argNums==3 && (funcName=="memset" || funcName=="memcpy")){
-            Expr* arg1 = node->getArg(0);
-            Expr* arg3 = node->getArg(2);
+        if(callExpr->getNumArgs()==3 && (funcName=="memset" || funcName=="memcpy")){
+            Expr* arg1 = callExpr->getArg(0);
+            Expr* arg3 = callExpr->getArg(2);
             
             int arg1Type = getArg1Type(arg1); //1:array, 2:pointer
             int arg3Type = getArg3Type(arg3); //11:sizeof(array),12:sizeof(*array),13:Integerliteral, 14:IntegerLiteral*sizeof(Int)
@@ -99,42 +99,42 @@ public:
             }
             if(violation){
                 string message = "A call of the '"+funcName+"' function will lead to a buffer overflow or underflow.";
-                addViolation(node, this, message); 
+                addViolation(callExpr, this, message); 
             }
         }
         return true;
     }
 private:
     int getArg1Type(Expr* arg1){ //1:array, 2:pointer
-        if(isa<ImplicitCastExpr>(arg1)){
+        if(arg1 && isa<ImplicitCastExpr>(arg1)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(arg1);
             arg1 = implicitCastExpr->getSubExpr();
         }
-        if(isa<ImplicitCastExpr>(arg1)){
+        if(arg1 && isa<ImplicitCastExpr>(arg1)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(arg1);
             arg1 = implicitCastExpr->getSubExpr();
         }
-        if(isa<DeclRefExpr>(arg1)){
-            DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(arg1);
-            if(declRefExpr->getType()->isArrayType())return 1;
-            if(declRefExpr->getType()->isPointerType())return 2;
+        if(arg1 && isa<DeclRefExpr>(arg1)){
+            DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(arg1);
+            if(dre && dre->getType()->isArrayType())return 1;
+            if(dre && dre->getType()->isPointerType())return 2;
         }
         return 0;
     }
     
     int getArg3Type(Expr* arg3){ //11:sizeof(array),12:sizeof(*array),13:Integerliteral, 14:IntegerLiteral*sizeof(Int)
                        //21:sizeof(point),22:sizeof(*point)
-        if(isa<UnaryExprOrTypeTraitExpr>(arg3)){//sizeof
+        if(arg3 && isa<UnaryExprOrTypeTraitExpr>(arg3)){//sizeof
             UnaryExprOrTypeTraitExpr* unaryExprOrTypeTraitExpr = dyn_cast_or_null<UnaryExprOrTypeTraitExpr>(arg3);
             if(unaryExprOrTypeTraitExpr->getKind()!=UETT_SizeOf)return 0; //sizeof
             
             arg3 = unaryExprOrTypeTraitExpr->getArgumentExpr();
-            if(isa<ParenExpr>(arg3)){
+            if(arg3 && isa<ParenExpr>(arg3)){
                 ParenExpr* parenExpr = dyn_cast_or_null<ParenExpr>(arg3);
                 arg3 = parenExpr->getSubExpr();
             }
             bool deref = false;
-            if(isa<UnaryOperator>(arg3)){
+            if(arg3 && isa<UnaryOperator>(arg3)){
                 UnaryOperator* unaryOperator = dyn_cast_or_null<UnaryOperator>(arg3);
                 arg3 = unaryOperator->getSubExpr();
                 if(unaryOperator->getOpcode() == UO_Deref){
@@ -142,16 +142,16 @@ private:
                 }
                 
             }
-            if(isa<ImplicitCastExpr>(arg3)){
+            if(arg3 && isa<ImplicitCastExpr>(arg3)){
                 ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(arg3);
                 arg3 = implicitCastExpr->getSubExpr();
             }
             int type=0; //1:array,2:pointer,0:未知
-            if(isa<DeclRefExpr>(arg3)){
-                DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(arg3);
+            if(arg3 && isa<DeclRefExpr>(arg3)){
+                DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(arg3);
                 
-                if(declRefExpr->getType()->isPointerType()) type=2;
-                else if(declRefExpr->getType()->isArrayType()) type=1;
+                if(dre && dre->getType()->isPointerType()) type=2;
+                else if(dre && dre->getType()->isArrayType()) type=1;
             }
             
             if(type==1){//array
@@ -162,14 +162,14 @@ private:
                 else return 21;
             } 
             
-        }else if(isa<BinaryOperator>(arg3)){
+        }else if(arg3 && isa<BinaryOperator>(arg3)){
             return 14;
         }
         else{
-            if(isa<ImplicitCastExpr>(arg3)){
+            if(arg3 && isa<ImplicitCastExpr>(arg3)){
                 ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(arg3);
                 arg3 = implicitCastExpr->getSubExpr();
-                if(isa<IntegerLiteral>(arg3))return 13;
+                if(arg3 && isa<IntegerLiteral>(arg3))return 13;
             }
             return 0;
         }

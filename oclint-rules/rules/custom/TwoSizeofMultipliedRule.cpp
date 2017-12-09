@@ -95,7 +95,7 @@ public:
     
 private:
     bool isSizeofOperator(Expr* expr){
-        if(isa<UnaryExprOrTypeTraitExpr>(expr)){
+        if(expr && isa<UnaryExprOrTypeTraitExpr>(expr)){
             UnaryExprOrTypeTraitExpr* unaryOperator = dyn_cast<UnaryExprOrTypeTraitExpr>(expr);
             if(unaryOperator->getKind()==UETT_SizeOf){
                 return true;

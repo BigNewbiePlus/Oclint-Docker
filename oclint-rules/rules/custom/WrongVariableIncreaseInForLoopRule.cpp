@@ -82,6 +82,7 @@ public:
     bool VisitForStmt(ForStmt *parentStmt)
     {
         Stmt *bodyStmt = parentStmt->getBody();
+        if(!bodyStmt)return true;
         ForStmt *forStmt = dyn_cast_or_null<ForStmt>(bodyStmt);
         CompoundStmt *compoundStmt = dyn_cast_or_null<CompoundStmt>(bodyStmt);
         if (!forStmt && compoundStmt && compoundStmt->size() == 1)
@@ -108,16 +109,18 @@ public:
 private:
     VarDecl *varDeclFromInitStmt(Stmt *initStmt)
     {
+        if(!initStmt)return NULL;
         DeclStmt *declStmt = dyn_cast_or_null<DeclStmt>(initStmt);
         if (declStmt && declStmt->isSingleDecl())
         {
             return dyn_cast_or_null<VarDecl>(declStmt->getSingleDecl());
         }
-        return nullptr;
+        return NULL;
     }
 
     ValueDecl *valueDeclFromIncExpr(Expr *incExpr)
     {
+        if(!incExpr)return NULL;
         UnaryOperator *unaryOperator = dyn_cast_or_null<UnaryOperator>(incExpr);
         if (unaryOperator)
         {
@@ -128,7 +131,7 @@ private:
                 return declRefExpr->getDecl();
             }
         }
-        return nullptr;
+        return NULL;
     }
 
     bool isInnerIncMatchingOuterInit(Expr *incExpr, Stmt *initStmt,string& name)

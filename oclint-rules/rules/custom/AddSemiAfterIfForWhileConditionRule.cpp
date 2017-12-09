@@ -81,7 +81,7 @@ public:
     inline void checkBody(Stmt* stmt, string stmtType){
         if(stmt && isa<NullStmt>(stmt)){
             string message = "Odd semicolon ';' after '"+stmtType+"' operator.";
-            addViolation(node,this,message);
+            addViolation(stmt,this,message);
         }
         
     }

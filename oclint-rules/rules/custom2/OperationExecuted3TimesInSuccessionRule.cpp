@@ -84,11 +84,13 @@ public:
     bool VisitUnaryOperator(UnaryOperator *uo)
     {
         int cnt=0;
-        UnaryOperator* new_uo = uo;
-        while(new_uo){
-            if(new_uo->getOpcode()!=UO_LNot)break;
-            cnt++;
-            new_uo = dyn_cast_or_null<UnaryOperator>(new_uo->getSubExpr());
+        UnaryOperator* tmp_uo = uo;
+        while(tmp_uo){
+            if(tmp_uo->getOpcode()==UO_LNot){
+                tmp_uo = dyn_cast_or_null<UnaryOperator>(tmp_uo->getSubExpr());
+                cnt++;
+            }else
+                break;
         }
         if(cnt>2){
             string message = "The '!' operation is executed 3 or more times in succession.";

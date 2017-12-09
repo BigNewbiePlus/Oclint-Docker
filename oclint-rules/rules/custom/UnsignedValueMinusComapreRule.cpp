@@ -87,7 +87,7 @@ public:
         if(binaryOperator->getOpcode()!=BO_GT)return true;
         Expr* lhs = binaryOperator->getLHS();    
         Expr* rhs = binaryOperator->getRHS();
-        if(!isa<BinaryOperator>(lhs))return true;
+        if(!lhs ||!isa<BinaryOperator>(lhs))return true;
         
         BinaryOperator* binaryOperator2 = dyn_cast<BinaryOperator>(lhs);
         Expr* llhs = binaryOperator2->getLHS();
@@ -95,7 +95,7 @@ public:
         
         if(binaryOperator2->getOpcode()!=BO_Sub)return true;
         
-        if(isZeroValue(rhs) && isUnsigned(llhs) && isUnsigned(lrhs)){
+        if(rhs && llhs && lrhs && isZeroValue(rhs) && isUnsigned(llhs) && isUnsigned(lrhs)){
             string message = "The expression '"+expr2str(binaryOperator)+"' will work as '"+expr2str(llhs)+" != "+expr2str(lrhs)+"'.";
             addViolation(binaryOperator, this, message);
         }
@@ -103,12 +103,12 @@ public:
     }
 private:
    bool  isZeroValue(Expr* expr){
-       if(isa<ImplicitCastExpr>(expr)){
+       if(expr && isa<ImplicitCastExpr>(expr)){
            ImplicitCastExpr* implicitCastExpr = dyn_cast<ImplicitCastExpr>(expr);
            expr = implicitCastExpr->getSubExpr();
        }
        
-       if(isa<IntegerLiteral>(expr)){
+       if(expr && isa<IntegerLiteral>(expr)){
            IntegerLiteral* integerLiteral = dyn_cast<IntegerLiteral>(expr);
            if(integerLiteral->getValue().getSExtValue()==0)return true;
        }
@@ -116,7 +116,7 @@ private:
    }
     
     bool isUnsigned(Expr* expr){
-        return expr->getType()->isUnsignedIntegerType();
+        return expr && expr->getType()->isUnsignedIntegerType();
     }
     
     std::string expr2str(Expr *expr) {

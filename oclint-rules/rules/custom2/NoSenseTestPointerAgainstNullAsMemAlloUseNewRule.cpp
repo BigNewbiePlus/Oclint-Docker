@@ -80,9 +80,9 @@ public:
     virtual void tearDown() override {}
 
     VarDecl* getVarDecl(DeclStmt* ds){
-        if(ds->isSingleDecl()){
+        if(ds && ds->isSingleDecl()){
             Decl* decl = ds->getSingleDecl();
-            if(isa<VarDecl>(decl)){
+            if(decl && isa<VarDecl>(decl)){
                 VarDecl* vd = dyn_cast_or_null<VarDecl>(decl);
                 return vd;
             }
@@ -92,7 +92,7 @@ public:
 
     string getCondVarName(Expr* expr){
         
-        if(isa<BinaryOperator>(expr)){
+        if(expr && isa<BinaryOperator>(expr)){
             BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(expr);
             expr = bo->getLHS();
         }
@@ -123,7 +123,7 @@ public:
                 BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(*it);
                 Expr* lhs = bo->getLHS();
                 Expr* rhs = bo->getRHS();
-                if(isa<DeclRefExpr>(lhs) && isa<CXXNewExpr>(rhs)){
+                if(lhs && rhs && isa<DeclRefExpr>(lhs) && isa<CXXNewExpr>(rhs)){
                     DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(lhs);
                     newPtrNames.insert(dre->getNameInfo().getAsString());
                 }

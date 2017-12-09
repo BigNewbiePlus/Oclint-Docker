@@ -127,10 +127,10 @@ public:
     }
 
     void getBinaNameAndVal(Stmt* stmt, string& name, string& value){
-        if(isa<ExprWithCleanups>(stmt)){
+        if(stmt && isa<ExprWithCleanups>(stmt)){
             ExprWithCleanups* ewc = dyn_cast_or_null<ExprWithCleanups>(stmt);
             Expr* expr = ewc->getSubExpr();
-            if(isa<CXXOperatorCallExpr>(expr)){
+            if(expr && isa<CXXOperatorCallExpr>(expr)){
                 CXXOperatorCallExpr* cxxoce = dyn_cast_or_null<CXXOperatorCallExpr>(expr);
                 if(cxxoce->getNumArgs()==2){
                     name = getNameFromExpr(cxxoce->getArg(0));
@@ -141,11 +141,13 @@ public:
     }
 
     void getDeclNameAndVal(Stmt* stmt, string& name, string& value){
+        if(!stmt)return;
+
         if(isa<DeclStmt>(stmt)){
             DeclStmt* ds  = dyn_cast_or_null<DeclStmt>(stmt);
-            if(ds->isSingleDecl()){
+            if(ds && ds->isSingleDecl()){
                 Decl* decl = ds->getSingleDecl();
-                if(isa<VarDecl>(decl)){
+                if(decl && isa<VarDecl>(decl)){
                     VarDecl* vd = dyn_cast_or_null<VarDecl>(decl);
                     string type = vd->getType().getAsString();
                     if(type.find("::iterator")!=string::npos){//容器

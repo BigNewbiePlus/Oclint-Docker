@@ -83,7 +83,7 @@ public:
     virtual void tearDown() override {}
 
     bool isNonZeroValue(Expr* expr){
-        if(isa<IntegerLiteral>(expr)){
+        if(expr && isa<IntegerLiteral>(expr)){
             IntegerLiteral* il=dyn_cast_or_null<IntegerLiteral>(expr);
             return il->getValue().getSExtValue()!=0;
         }

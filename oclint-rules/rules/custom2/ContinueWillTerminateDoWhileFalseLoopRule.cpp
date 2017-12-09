@@ -83,9 +83,9 @@ public:
     bool VisitDoStmt(DoStmt *ds)
     {
         Expr* cond = ds->getCond();
-        if(isa<CXXBoolLiteralExpr>(cond)){
+        if(cond && isa<CXXBoolLiteralExpr>(cond)){
             CXXBoolLiteralExpr* cxxble = dyn_cast_or_null<CXXBoolLiteralExpr>(cond);
-            if(cxxble->getValue()==false){
+            if(cxxble && cxxble->getValue()==false){
                 string message = "The 'continue' operator will terminate 'do { ... } while (FALSE)' loop because the condition is always false.";
                 addViolation(cond, this, message);
             }

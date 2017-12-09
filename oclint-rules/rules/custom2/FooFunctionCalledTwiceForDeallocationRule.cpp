@@ -83,6 +83,7 @@ public:
     /* Visit CompoundStmt */
     bool VisitCompoundStmt(CompoundStmt * cs)
     {
+        if(cs->size()<2)return true;
         set<string> baseNames;
         for(CompoundStmt::body_iterator it=cs->body_begin(); it!=cs->body_end(); it++){
             if(isa<CXXMemberCallExpr>(*it)){
@@ -90,7 +91,7 @@ public:
                 string funcName = callExpr->getDirectCallee()->getNameInfo().getAsString();
                 if(funcName=="clear"){
                     Expr* base = callExpr->getImplicitObjectArgument();
-                    if(isa<DeclRefExpr>(base)){
+                    if(base && isa<DeclRefExpr>(base)){
                         DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(base);
                         string baseName = dre->getNameInfo().getAsString();
                         if(baseNames.find(baseName)!=baseNames.end()){

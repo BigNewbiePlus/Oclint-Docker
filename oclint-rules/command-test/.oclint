@@ -27,7 +27,6 @@ rules:
  - InvalidPointToLocalArray
  - InvalidPointToLocalVariable
  - InvalidSizeOfArgumentArrayPoint
- - IteratorsAsArgument
  - LowerPriorityOfConditionalExpression
  - MemFunCallLeadOverOrUnderFlowWithSizeof
  - MissingSemicolonAfterReturn
@@ -82,7 +81,6 @@ rules:
  - IncompatibleMemoryAllocationAndDeallocationMethod
  - InitAndFinalForIteratorValueAreSame
  - IteratorInitAndFinalValueDifferInForLoop
- - MacroExpansionResultIncorrectOrder
  - MisprintsCommaForSemicolon
  - NonVoidFunctionShouldReturnAValue
  - NoSenseTestPointerAgainstNullAsMemAlloUseNew

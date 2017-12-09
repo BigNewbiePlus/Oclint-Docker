@@ -93,9 +93,9 @@ public:
 private:
     void checkUnsenseExpr(Expr* expr){
         string message = "Such expressions using the ',' operator are dangerous. Make sure the expression is correct.";
-        
+        if(!expr)return;
         if(isa<CompoundAssignOperator>(expr)){
-                   
+            return;
         }else if(isa<BinaryOperator>(expr)){          
             BinaryOperator* binaryOperator = dyn_cast<BinaryOperator>(expr);
             BinaryOperatorKind bok = binaryOperator->getOpcode();
@@ -113,12 +113,9 @@ private:
             
             if((uok!=UO_PostInc) && (uok!=UO_PostDec) && (uok!=UO_PreInc) && (uok!=UO_PreDec)){
                 addViolation(expr, this, message);
-                
             }
-            
         }else{
             addViolation(expr, this, message);
-            
         }   
     }
 };

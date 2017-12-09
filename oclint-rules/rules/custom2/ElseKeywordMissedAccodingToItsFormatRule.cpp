@@ -84,9 +84,11 @@ public:
     /* Visit CompoundStmt */
     bool VisitCompoundStmt(CompoundStmt *cs) 
     {
+        if(cs->size()<2)return true;
         for(CompoundStmt::body_iterator it=cs->body_begin(); it!=cs->body_end();it++){
             if(isa<IfStmt>(*it) && it+1!=cs->body_end() && isa<IfStmt>(*(it+1))){
                 IfStmt* stmt1 = dyn_cast_or_null<IfStmt>(*it);
+                Stmt* then1 = stmt1->getThen();
                 IfStmt* stmt2 = dyn_cast_or_null<IfStmt>(*(it+1));
                 SourceLocation sle1 = stmt1->getLocEnd();
                 SourceLocation sls2 = stmt2->getLocStart();
@@ -94,7 +96,7 @@ public:
                 unsigned e1_col = sm->getSpellingColumnNumber(sle1);
                 unsigned s2_row = sm->getSpellingLineNumber(sls2);
                 unsigned s2_col = sm->getSpellingColumnNumber(sls2);
-                if(e1_row==s2_row){
+                if(then1 && isa<CompoundStmt>(then1) && e1_row==s2_row){
                     string message = "Consider inspecting the application's logic. It's possible that 'else' keyword is missing.";
                     addViolation(stmt2, this, message);
                 }

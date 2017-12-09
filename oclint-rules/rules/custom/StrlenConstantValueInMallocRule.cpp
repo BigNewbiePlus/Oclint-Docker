@@ -85,8 +85,10 @@ public:
     /* Visit CallExpr */
     bool VisitCallExpr(CallExpr *callExpr)
     {
-        unsigned argNum = callExpr->getNumArgs();
         FunctionDecl* funcDecl = callExpr->getDirectCallee();
+        if(!funcDecl)return false;
+
+        unsigned argNum = callExpr->getNumArgs();
         string callFuncName = funcDecl->getNameInfo().getAsString();
         
         Expr* argExpr = NULL;
@@ -98,6 +100,7 @@ public:
         if(argExpr && isa<CallExpr>(argExpr)){//调用函数的第1(2)个参数是strlen            
             callExpr = dyn_cast_or_null<CallExpr>(argExpr);
             funcDecl = callExpr->getDirectCallee();
+            if(!funcDecl)return false;
             string funcName = funcDecl->getNameInfo().getAsString();
             argNum = callExpr->getNumArgs();
             
@@ -122,12 +125,12 @@ private:
     }
     
     bool strlenArgViolation(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr = implicitCastExpr->getSubExpr();
         }
         
-        if(isa<BinaryOperator>(expr)){
+        if(expr && isa<BinaryOperator>(expr)){
             BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(expr);
             Expr* lhs = binaryOperator->getLHS();
             Expr* rhs = binaryOperator->getRHS();
@@ -136,11 +139,11 @@ private:
         return false;    
     }
     bool isIntegerLiteral(Expr* expr){
-       if(isa<ImplicitCastExpr>(expr)){
+       if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr = implicitCastExpr->getSubExpr();
         }
-        if(isa<IntegerLiteral>(expr))return true;
+        if(expr && isa<IntegerLiteral>(expr))return true;
         return false;
     }
 private:

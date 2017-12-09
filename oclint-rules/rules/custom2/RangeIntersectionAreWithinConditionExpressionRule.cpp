@@ -93,7 +93,7 @@ public:
         return false;
     }
     bool getBinaryCompareCondInfo(Expr* cond, string& name, BinaryOperatorKind& bok, int& value){
-        if(isa<BinaryOperator>(cond)){
+        if(cond && isa<BinaryOperator>(cond)){
             BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(cond);
             BinaryOperatorKind bokTmp = bo->getOpcode();
             if(bokTmp==BO_GT||bokTmp==BO_GE)bok=BO_GT; 

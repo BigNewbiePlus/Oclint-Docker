@@ -80,14 +80,14 @@ public:
     virtual void tearDown() override {}
 
     bool getControlVarName(Expr* expr, string& name){
-        if(isa<BinaryOperator>(expr)){
+        if(expr && isa<BinaryOperator>(expr)){
             BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(expr);
             expr = bo->getLHS();
-            if(isa<ImplicitCastExpr>(expr)){
+            if(expr && isa<ImplicitCastExpr>(expr)){
                 ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
                 expr = ice->getSubExpr();
             }
-            if(isa<DeclRefExpr>(expr)){
+            if(expr && isa<DeclRefExpr>(expr)){
                 DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(expr);
                 name = dre->getNameInfo().getAsString();
                 return true;
@@ -97,9 +97,9 @@ public:
     }
 
     string getSingleDeclVarName(DeclStmt* ds){
-        if(ds->isSingleDecl()){
+        if(ds && ds->isSingleDecl()){
             Decl* decl = ds->getSingleDecl();
-            if(isa<VarDecl>(decl)){
+            if(decl && isa<VarDecl>(decl)){
                 VarDecl* vd = dyn_cast_or_null<VarDecl>(decl);
                 return vd->getNameAsString();
             }
@@ -111,12 +111,12 @@ public:
     {
         Expr* cond = ws->getCond();
         string name1;
-        if(getControlVarName(cond, name1)){
+        if(cond && getControlVarName(cond, name1)){
             Stmt* body = ws->getBody();
-            if(isa<CompoundStmt>(body)){
+            if(body && isa<CompoundStmt>(body)){
                 CompoundStmt* cs = dyn_cast_or_null<CompoundStmt>(body);
                 for(CompoundStmt::body_iterator it=cs->body_begin(); it!=cs->body_end(); it++){
-                    if(isa<DeclStmt>(*it)){
+                    if(*it && isa<DeclStmt>(*it)){
                         DeclStmt* ds = dyn_cast_or_null<DeclStmt>(*it);
                         string name2 = getSingleDeclVarName(ds);
                         if(name1==name2){

@@ -84,7 +84,7 @@ public:
 
     bool isLAndPattern(ParenExpr* pe, string& name1, string& name2){
         Expr* expr = pe->getSubExpr();
-        if(isa<BinaryOperator>(expr)){
+        if(expr && isa<BinaryOperator>(expr)){
             BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(expr);
             if(bo->getOpcode()==BO_LAnd){
                 name1 = expr2str(bo->getLHS());
@@ -101,11 +101,11 @@ public:
             Expr* lhs = bo->getLHS();
             Expr* rhs = bo->getRHS();
             string name1, name2, name3;
-            if(isa<ParenExpr>(lhs)){
+            if(lhs && isa<ParenExpr>(lhs)){
                 swap(lhs, rhs);
             }
             
-            if(isa<ParenExpr>(rhs)){
+            if(rhs && isa<ParenExpr>(rhs)){
                 ParenExpr* pe = dyn_cast_or_null<ParenExpr>(rhs);
                 if(isLAndPattern(pe, name2, name3)){
                     name1 = expr2str(lhs);

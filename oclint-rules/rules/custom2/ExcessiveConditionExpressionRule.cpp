@@ -82,7 +82,7 @@ public:
     virtual void tearDown() override {}
 
     bool getExprNameAndKind(Expr* expr, string& name, BinaryOperatorKind& bok){
-        if(isa<BinaryOperator>(expr)){
+        if(expr && isa<BinaryOperator>(expr)){
             BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(expr);
             bok = binaryOperator->getOpcode();
             if(bok==BO_EQ||bok==BO_NE){

@@ -86,43 +86,36 @@ public:
     /* Visit IfStmt */
     bool VisitIfStmt(IfStmt *node)
     {
-        Expr* cond = node->getCond();
-        funcPointerComparedWithNull(cond);
+        funcPointerComparedWithNull(node->getCond());
         return true;
     }
     
 private:
     bool isFuncPointer(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
-            ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
-            expr = implicitCastExpr->getSubExpr();
-        }
-        if(isa<ImplicitCastExpr>(expr)){
-            ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
-            expr = implicitCastExpr->getSubExpr();
-        }
-        if(isa<DeclRefExpr>(expr)){
-            DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(expr);
-            if(declRefExpr->getType()->isFunctionType()){//是函数
-                return true;
-            }
+        while(expr){
+            if(isa<ImplicitCastExpr>(expr)){
+                ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
+                expr = implicitCastExpr->getSubExpr();
+            }else if(isa<DeclRefExpr>(expr)){
+                DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(expr);
+                return declRefExpr->getType()->isFunctionType();//是函数
+            }else
+                break;
         }
         return false;
         
     }
     
     bool isNull(Expr* expr){
-      
-        if(isa<ImplicitCastExpr>(expr)){
-            ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
-            expr = implicitCastExpr->getSubExpr();
-        }
-        string str = expr2str(expr);
-        if(str=="0" || str=="NULL"){
-            return true;
+        if(expr){ 
+            string str = expr2str(expr);
+            if(str=="0" || str=="NULL"){
+                return true;
+            }
         }
         return false;
     }
+
     std::string expr2str(Expr *expr) {
         // (T, U) => "T,,"
         string text = clang::Lexer::getSourceText(CharSourceRange::getTokenRange(expr->getSourceRange()), *sm, LangOptions(), 0);
@@ -131,48 +124,44 @@ private:
         return text;
     }
     void funcPointerComparedWithNull(Expr* expr){
-        if(isa<BinaryOperator>(expr)){
-            BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(expr);
-            clang::BinaryOperatorKind bok = binaryOperator->getOpcode();
-            Expr* lhs = binaryOperator->getLHS();
-            Expr* rhs = binaryOperator->getRHS();
-            if(bok==BO_EQ || bok==BO_NE){//"==" 或 "!="
-                if((isFuncPointer(lhs)&&isNull(rhs)) || (isNull(lhs)&&isFuncPointer(rhs))){
+        while(expr){
+            
+            if(expr && isa<BinaryOperator>(expr)){
+                BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(expr);
+                BinaryOperatorKind bok = bo->getOpcode();
+                Expr* lhs = bo->getLHS();
+                Expr* rhs = bo->getRHS();
+                if(bok==BO_EQ || bok==BO_NE){//"==" 或 "!="
+                    if((isFuncPointer(lhs)&&isNull(rhs)) || (isNull(lhs)&&isFuncPointer(rhs))){
+                        string exprStr = expr2str(expr);
+                        string message = "Consider inspecting an odd expression. Non-null function pointer is compared to null: '"+exprStr+"'";
+                         addViolation(expr, this, message);
+                    }
+                }else{
+                    funcPointerComparedWithNull(lhs);
+                    funcPointerComparedWithNull(rhs);
+                }
+                break;
+            }else if(isa<ParenExpr>(expr)){
+                ParenExpr* parenExpr = dyn_cast_or_null<ParenExpr>(expr);
+                expr = parenExpr->getSubExpr();
+            }else if(isa<UnaryOperator>(expr)){
+                UnaryOperator* unaryOperator = dyn_cast_or_null<UnaryOperator>(expr);
+                expr = unaryOperator->getSubExpr();
+            }else if(isa<ImplicitCastExpr>(expr)){
+                ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
+                expr = ice->getSubExpr();
+            }else if(isa<DeclRefExpr>(expr)){
+                DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(expr);
+                if(dre && dre->getType()->isFunctionType()){//是函数
                     string exprStr = expr2str(expr);
                     string message = "Consider inspecting an odd expression. Non-null function pointer is compared to null: '"+exprStr+"'";
                     addViolation(expr, this, message);
                 }
-            }else{
-                funcPointerComparedWithNull(lhs);
-                funcPointerComparedWithNull(rhs);
-            }
-            return;
-        }
-        if(isa<ParenExpr>(expr)){
-            ParenExpr* parenExpr = dyn_cast_or_null<ParenExpr>(expr);
-            expr = parenExpr->getSubExpr();
-            funcPointerComparedWithNull(expr);
-            return;
-        }
-        if(isa<UnaryOperator>(expr)){
-            UnaryOperator* unaryOperator = dyn_cast_or_null<UnaryOperator>(expr);
-            expr = unaryOperator->getSubExpr();
-            funcPointerComparedWithNull(expr);
-            return;
-        }
-        if(isa<ImplicitCastExpr>(expr)){
-            ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
-            expr = implicitCastExpr->getSubExpr();
-            funcPointerComparedWithNull(expr);
-            return;
-        }
-        if(isa<DeclRefExpr>(expr)){
-            DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(expr);
-            if(declRefExpr->getType()->isFunctionType()){//是函数
-                string exprStr = expr2str(expr);
-                string message = "Consider inspecting an odd expression. Non-null function pointer is compared to null: '"+exprStr+"'";
-                addViolation(expr, this, message);
-            }
+                break;
+            }else
+                break;
+    
         }
     }
 private:

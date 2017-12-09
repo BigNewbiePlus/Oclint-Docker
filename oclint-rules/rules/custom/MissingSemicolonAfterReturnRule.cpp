@@ -86,7 +86,7 @@ public:
     bool VisitIfStmt(IfStmt *node)
     {
         Stmt* then = node->getThen();
-        if(isa<ReturnStmt>(then)){//if语句后直接跟return语句
+        if(then && isa<ReturnStmt>(then)){//if语句后直接跟return语句
             ReturnStmt* returnStmt = dyn_cast_or_null<ReturnStmt>(then);
             Expr* returnValue = returnStmt->getRetValue();
             if(returnValue){//不为空

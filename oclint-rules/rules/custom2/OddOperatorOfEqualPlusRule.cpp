@@ -84,7 +84,7 @@ public:
     {
         if(binaryOperator->getOpcode()==BO_Assign){
             Expr* rhs = binaryOperator->getRHS();
-            if(isa<UnaryOperator>(rhs)){
+            if(rhs && isa<UnaryOperator>(rhs)){
                 UnaryOperator* unaryOperator = dyn_cast_or_null<UnaryOperator>(rhs);
                 if(unaryOperator->getOpcode()==UO_Plus){
                     string message = "The expression of the 'A =+ B' kind is utilized. Consider reviewing it, as it is possible that 'A += B' was meant.";

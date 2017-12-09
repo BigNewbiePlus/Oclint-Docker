@@ -109,6 +109,8 @@ public:
     
 private:
     void getLocalDeclVarsName(DeclStmt* declStmt, map<string,bool>& varNames){
+        if(!declStmt)return;
+
         for(clang::DeclStmt::decl_iterator decl_it = declStmt->decl_begin(); decl_it!=declStmt->decl_end();decl_it++){
             Decl* decl = *decl_it;
             if(isa<VarDecl>(decl)){
@@ -120,11 +122,11 @@ private:
         
     }
     bool isPointerType(Expr* expr){
-        return expr->getType()->isPointerType();
+        return expr && expr->getType()->isPointerType();
     }
     string getLHSName(Expr* lhs, map<string, bool>& localVarNames){
         string lname;
-        if(isa<DeclRefExpr>(lhs)){
+        if(lhs && isa<DeclRefExpr>(lhs)){
             DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(lhs);
             lname = declRefExpr->getNameInfo().getAsString();
         }
@@ -132,15 +134,15 @@ private:
     }
     string getRHSName(Expr* rhs, map<string, bool>& localVarNames){
         string rname;
-        if(isa<UnaryOperator>(rhs)){            
+        if(rhs && isa<UnaryOperator>(rhs)){            
             UnaryOperator* unaryOperator = dyn_cast_or_null<UnaryOperator>(rhs);                
             rhs = unaryOperator->getSubExpr();            
         }
-        if(isa<ImplicitCastExpr>(rhs)){
+        if(rhs && isa<ImplicitCastExpr>(rhs)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(rhs);
             rhs = implicitCastExpr->getSubExpr();
         }
-        if(isa<DeclRefExpr>(rhs)){
+        if(rhs && isa<DeclRefExpr>(rhs)){
             DeclRefExpr* declRefExpr = dyn_cast_or_null<DeclRefExpr>(rhs);
             rname = declRefExpr->getNameInfo().getAsString();
         }

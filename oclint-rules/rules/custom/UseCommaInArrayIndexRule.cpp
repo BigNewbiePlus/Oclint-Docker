@@ -86,11 +86,11 @@ public:
     bool VisitArraySubscriptExpr(ArraySubscriptExpr *node)
     {
         Expr* idx = node->getIdx();
-        if(isa<BinaryOperator>(idx)){
+        if(idx && isa<BinaryOperator>(idx)){
             BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(idx);
             Expr* lhs = binaryOperator->getLHS();
             Expr* rhs = binaryOperator->getRHS();
-            if(binaryOperator->getOpcode()==BO_Comma && isa<IntegerLiteral>(lhs) && isa<IntegerLiteral>(rhs)){
+            if(binaryOperator->getOpcode()==BO_Comma && lhs && isa<IntegerLiteral>(lhs) && rhs && isa<IntegerLiteral>(rhs)){
                 string exprStr = expr2str(node);
                 string message = "The comma operator ',' in array index expression '"+exprStr+"'.";
                 addViolation(node,this,message);

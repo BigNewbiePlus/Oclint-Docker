@@ -83,17 +83,17 @@ public:
     virtual void tearDown() override {}
 
     bool isZeroConstantValue(Expr* expr){
-        if(isa<ImplicitCastExpr>(expr)){
+        if(expr && isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr = ice->getSubExpr();
         }
-        if(isa<DeclRefExpr>(expr)){
+        if(expr && isa<DeclRefExpr>(expr)){
             DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(expr);
             ValueDecl* vd= dre->getDecl();
 
-            if(isa<EnumConstantDecl>(vd)){
+            if(vd && isa<EnumConstantDecl>(vd)){
                 EnumConstantDecl* ecd = dyn_cast_or_null<EnumConstantDecl>(vd);
-                return ecd->getInitVal().getSExtValue()==0;
+                return ecd && ecd->getInitVal().getSExtValue()==0;
             }
         }
         return false;

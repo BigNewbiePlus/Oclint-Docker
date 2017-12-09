@@ -110,7 +110,7 @@ public:
     /* Visit VarDecl */
     bool VisitVarDecl(VarDecl *vd)
     {
-        if(vd->hasInit()){
+        if(vd && vd->hasInit()){
             Expr* expr = vd->getInit();
             //获取模式T foo = foo = x;
             string name2;

@@ -210,7 +210,7 @@ private:
                 if(violation_vars.size()==0){//未违反
                     vars_init[lname]=true;
                 }else{//违反了
-                    declViolation(violation_vars, one_decl, wrong_info, level);
+                    declViolation(violation_vars, *decl, wrong_info, level);
                 }
             }
         }
@@ -249,7 +249,7 @@ private:
             Expr* expr = ice->getSubExpr();
             if(isa<DeclRefExpr>(expr)){
                 DeclRefExpr *dre = dyn_cast_or_null<DeclRefExpr>(expr);
-                std::string rname =  initExpr->getNameInfo().getAsString();
+                std::string rname =  dre->getNameInfo().getAsString();
                 result.push_back(rname);
             }
         }
@@ -293,7 +293,7 @@ private:
         Expr* rhs = binaryOperator;
         //解析赋值语句和表达式语句
         vector<string> lnames;
-        while(irhs && isa<BinaryOperator>(rhs)){
+        while(rhs && isa<BinaryOperator>(rhs)){
             BinaryOperator* binary = dyn_cast_or_null<BinaryOperator>(rhs);
             if(binary->getOpcode()==BO_Assign){
                 Expr* lhs = binaryOperator->getLHS(); //获取左端
