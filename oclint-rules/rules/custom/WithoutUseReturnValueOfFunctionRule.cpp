@@ -1,5 +1,6 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
+#include<set>
 using namespace std;
 using namespace clang;
 using namespace oclint;
@@ -75,7 +76,10 @@ public:
     */
 #endif
 
-    virtual void setUp() override {}
+    virtual void setUp() override {
+        string funNames[] = {"empty", "size", "back"};
+        checkNames.insert(funNames, funNames+3);
+    }
     virtual void tearDown() override {}
 
     /* Visit CompoundStmt */
@@ -99,16 +103,19 @@ private:
             CallExpr* callExpr = dyn_cast_or_null<CallExpr>(stmt);
             funcDecl = callExpr->getDirectCallee();
         }
-        if(!funcDecl)return;
         
-        if(!funcDecl->getReturnType()->isVoidType()){//返回值不为空
+        if(funcDecl && !funcDecl->getReturnType()->isVoidType()){//返回值不为空
             string funcName = funcDecl->getNameInfo ().getAsString();
-            string message = "The return value of function '"+funcName+"' is required to be utilized.";
-            addViolation(stmt,this,message);
+            if(checkNames.find(funcName)!=checkNames.end()){
+                string message = "The return value of function '"+funcName+"' is required to be utilized.";
+                addViolation(stmt,this,message);
+            }
         }
         
     }
 
+private:
+    set<string> checkNames;
 };
 
 static RuleSet rules(new WithoutUseReturnValueOfFunctionRule());  

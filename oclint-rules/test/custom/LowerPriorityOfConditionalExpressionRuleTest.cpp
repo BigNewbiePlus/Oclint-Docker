@@ -14,23 +14,26 @@ TEST(LowerPriorityOfConditionalExpressionRuleTest, NoViolationInstance)
     
     testRuleOnCXXCode(new LowerPriorityOfConditionalExpressionRule(), "void m(){int a,b,c;a=a?a:b;}");
     testRuleOnCXXCode(new LowerPriorityOfConditionalExpressionRule(), "void m(){int a=0,b,c;a=(a-b)?a:b;}");
+    testRuleOnCXXCode(new LowerPriorityOfConditionalExpressionRule(), "void m(){int a=0,b,c;a=a>b?a:b;}");
+    testRuleOnCXXCode(new LowerPriorityOfConditionalExpressionRule(), "void m(){int a=0,b,c;a=a+b?a:b;}");
 }
 
 TEST(LowerPriorityOfConditionalExpressionRuleTest, Test1)
 {
          
-    testRuleOnCXXCode(new LowerPriorityOfConditionalExpressionRule(), "void m(){int a,b;a=a-b?a:b;}",
-            0, 1, 20, 1, 26, 
-                      "Perhaps the '?:' operator works in a different way than it was expected.The '?:' operator has a lower priority than the '-' operator.");
+    testRuleOnCXXCode(new LowerPriorityOfConditionalExpressionRule(), "void m(){int a, b; bool flag;a=\na+flag?a:b;}",
+            0, 2, 1, 2, 10, 
+                      "Check priority in conditional expression 'a+flag?a:b', the operator '+' has more priority than '?:'!");
 }
 
 TEST(LowerPriorityOfConditionalExpressionRuleTest, Test2) 
 {
 
     testRuleOnCXXCode(new LowerPriorityOfConditionalExpressionRule(), 
-            "void m(){int a,b,c;a=a|b?a:b;}",
-            0, 1, 22, 1, 28, 
-                     "Perhaps the '?:' operator works in a different way than it was expected.The '?:' operator has a lower priority than the '|' operator.");
+            "void m(){int a,b,c;a=\na|(b==c)?a:b;}",
+            0, 2, 1, 2, 12, 
+            "Check priority in conditional expression 'a|(b==c)?a:b', the operator '|' has more priority than '?:'!"
+            );
     
 }
 
@@ -38,18 +41,16 @@ TEST(LowerPriorityOfConditionalExpressionRuleTest, Test3)
 {
 
     testRuleOnCXXCode(new LowerPriorityOfConditionalExpressionRule(), 
-            "void m(){int a,b;a=a&&b?a:b;}",
-            0, 1, 20, 1, 27,
-                     "Perhaps the '?:' operator works in a different way than it was expected.The '?:' operator has a lower priority than the '&&' operator.");
-    
+            "void m(){int a,b; bool flag; a=\na*(b>0)?a:b;}",
+            0, 2, 1, 2, 11,
+            "Check priority in conditional expression 'a*(b>0)?a:b', the operator '*' has more priority than '?:'!"); 
 }
-
 TEST(LowerPriorityOfConditionalExpressionRuleTest, Test4) 
 {
 
     testRuleOnCXXCode(new LowerPriorityOfConditionalExpressionRule(), 
-            "void foo(){int a,b,c;a>=b?a:b;}",
-            0, 1, 22, 1, 29,
-                     "Perhaps the '?:' operator works in a different way than it was expected.The '?:' operator has a lower priority than the '>=' operator.");
-    
+            "void m(){int a,b; bool flag; a=\na+(b>a)?a:b;}",
+            0, 2, 1, 2, 11,
+            "Check priority in conditional expression 'a+(b>a)?a:b', the operator '+' has more priority than '?:'!"); 
 }
+

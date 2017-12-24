@@ -83,16 +83,23 @@ public:
     virtual void tearDown() override {}
     
     //Visit Expr
-    bool VisitBinaryOperator(BinaryOperator *binaryOperator)
+    bool VisitBinaryOperator(BinaryOperator *bo)
     {
+        BinaryOperatorKind bok = bo->getOpcode();
+        if(bok!=BO_PtrMemD && bok!=BO_PtrMemI && bok!=BO_Comma){
+            Expr* lhs = bo->getLHS();    
+            Expr* rhs = bo->getRHS();
         
-        Expr* lhs = binaryOperator->getLHS();    
-        Expr* rhs = binaryOperator->getRHS();
-        
-        string expr1 = expr2str(lhs);
-        if(expr1==expr2str(rhs)){            
-            string message = "'"+expr1+"' repeated!";
-            addViolation(binaryOperator, this, message);
+            if(lhs && rhs){
+
+                string expr1 = expr2str(lhs);
+                string expr2 = expr2str(rhs);
+                if(expr1.size() && expr2.size() && expr1==expr2){
+                    string ops = (bo->getOpcodeStr()).str();
+                    string message = "'"+expr1+"' repeated in expression '"+expr1+ops+expr2+"' !";
+                    addViolation(bo, this, message);
+                }
+            }
         }
         return true;
     }

@@ -81,58 +81,42 @@ public:
         sm = &_carrier->getSourceManager();
     }
     virtual void tearDown() override {}
-
-    /* Visit IfStmt */
-    bool VisitIfStmt(IfStmt *node)
+    
+    /* Visit BinaryOperator */
+    bool VisitBinaryOperator(BinaryOperator* bo)
     {
-        checkConstant(node->getCond());
-        return true;
-    }
-     
-    /* Visit WhileStmt */
-    bool VisitWhileStmt(WhileStmt *node)
-    {
-        checkConstant(node->getCond());
-        return true;
-    }
-     
-
-    /* Visit DoStmt */
-    bool VisitDoStmt(DoStmt *node)
-    {
-        checkConstant(node->getCond());
-        return true;
+        BinaryOperatorKind bok = bo->getOpcode();
+        //如果是逻辑运算&&或在||
+        if(bok==BO_LAnd || bok==BO_LOr){
+            Expr* lhs = bo->getLHS();
+            Expr* rhs = bo->getRHS();
+            if(isIntegerOrEnum(lhs) || isIntegerOrEnum(rhs)){
+                string message = "A part of conditional expression is constant in '"+expr2str(bo)+"'."; 
+                addViolation(bo, this, message);
+            }
+        }
+        
     }
     
 private:
 
-    void checkConstant(Expr* expr)
-    {
-        while(expr){
-            if(isa<UnaryOperator>(expr)){
-                UnaryOperator* unaryOperator = dyn_cast<UnaryOperator>(expr);
-                expr = unaryOperator->getSubExpr();
-            }else if(isa<ImplicitCastExpr>(expr)){
-                ImplicitCastExpr* implicitCastExpr = dyn_cast<ImplicitCastExpr>(expr);
-                expr = implicitCastExpr->getSubExpr();
-            }else if(isa<ParenExpr>(expr)){
-                ParenExpr* parenExpr = dyn_cast<ParenExpr>(expr);
-                expr = parenExpr->getSubExpr();
-            }else if(isa<BinaryOperator>(expr)){
-                BinaryOperator* binaryOperator = dyn_cast<BinaryOperator>(expr);
-                BinaryOperatorKind bok = binaryOperator->getOpcode();
-                if(bok==BO_LOr || bok==BO_LAnd){
-                    checkConstant(binaryOperator->getLHS());
-                    checkConstant(binaryOperator->getRHS());
-                }
-                break;
-            }else if(isa<IntegerLiteral>(expr)){
-                string message = "A part of conditional expression is always true: "+expr2str(expr)+"."; 
-                addViolation(expr,this,message);  
-                break;
-            }else
-                break;
-        }      
+    bool isIntegerOrEnum(Expr* expr){
+        if(isa<ImplicitCastExpr>(expr)){    
+            ImplicitCastExpr* implicitCastExpr = dyn_cast<ImplicitCastExpr>(expr);
+            expr = implicitCastExpr->getSubExpr();
+        }
+        if(isa<ParenExpr>(expr)){
+            ParenExpr* parenExpr = dyn_cast<ParenExpr>(expr);
+            expr = parenExpr->getSubExpr();
+        }
+        if(isa<IntegerLiteral>(expr)){
+            return true;
+        }else if(isa<DeclRefExpr>(expr)){
+            DeclRefExpr* dre = dyn_cast_or_null<DeclRefExpr>(expr);
+            return dre->getType()->isEnumeralType();
+        }
+        return false;
+
     }
     
     std::string expr2str(Expr *expr) {
@@ -145,7 +129,6 @@ private:
     }
 private:
     SourceManager* sm;
-     
 };
 
 static RuleSet rules(new PartOfConditionIsConstantValueRule()); 

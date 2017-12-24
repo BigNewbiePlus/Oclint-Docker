@@ -19,6 +19,14 @@ TEST(CmpFuncUseInConditionRuleTest, NoViolationInstance)
                    "if(strcmp(str,\"hello\")!=0 && (strcmp(str,\"world\")==0))\n{" 
                    "}}" 
                   );
+    testRuleOnCXXCode(new CmpFuncUseInConditionRule(),
+                   "#include<string>\n"
+                   "using namespace std;"
+                   "void foo(){\n" 
+                   "string a,b;\n"
+                   "if(a==b)\n{" 
+                   "}}" 
+                  );
 }
 
 TEST(CmpFuncUseInConditionRuleTest, Test1)

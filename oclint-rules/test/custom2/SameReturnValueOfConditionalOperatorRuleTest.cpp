@@ -22,7 +22,7 @@ TEST(SameReturnValueOfConditionalOperatorRuleTest, Test1)
          
     testRuleOnCXXCode(new SameReturnValueOfConditionalOperatorRule(), 
             "void m(){int a;\n"
-            "a=a>0?a:a;}",0, 2, 3, 2, 9, "The '?:' operator, regardless of its conditional expression, always returns one and the same value.");
+            "a=a>0?a:a;}",0, 2, 3, 2, 9, "the conditional operation 'a>0?a:a' always returns the same value 'a'.");
 }
 
 TEST(SameReturnValueOfConditionalOperatorRuleTest, Test2)
@@ -30,5 +30,5 @@ TEST(SameReturnValueOfConditionalOperatorRuleTest, Test2)
          
     testRuleOnCXXCode(new SameReturnValueOfConditionalOperatorRule(), 
             "void m(){int a;\n"
-            "a=a>0?a-10:a-10;}",0, 2, 3, 2, 14, "The '?:' operator, regardless of its conditional expression, always returns one and the same value.");
+            "a=a>0?a-10:a-10;}",0, 2, 3, 2, 14, "the conditional operation 'a>0?a-10:a-10' always returns the same value 'a-10'.");
 }

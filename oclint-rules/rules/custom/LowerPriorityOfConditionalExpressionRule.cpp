@@ -1,5 +1,7 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
+#include "clang/Lex/Lexer.h"
+
 using namespace std;
 using namespace clang;
 using namespace oclint;
@@ -76,29 +78,50 @@ public:
 #endif
 
     virtual void setUp() override {
-        
+        sm = &_carrier->getSourceManager();
     }
     virtual void tearDown() override {
         
     }
 
    /* Visit ConditionalOperator */
-    bool VisitConditionalOperator(ConditionalOperator *node)
+    bool VisitConditionalOperator(ConditionalOperator *co)
     {
-        Expr* condExpr = node->getCond();
-        if(condExpr && isa<ImplicitCastExpr>(condExpr)){
-            ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(condExpr);
-            condExpr = implicitCastExpr->getSubExpr();
-        }
-        if(condExpr && isa<BinaryOperator>(condExpr)){//条件表达式条件是二元是，可能存在优先级问题
-            BinaryOperator* binaryOperator = dyn_cast_or_null<BinaryOperator>(condExpr);
-            string opcStr = binaryOperator->getOpcodeStr();
-            string message = "Perhaps the '?:' operator works in a different way than it was expected.The '?:' operator has a lower priority than the '"+opcStr+"' operator.";
-            addViolation(node, this, message);
+        Expr* cond = co->getCond();
+        if(cond && isa<ImplicitCastExpr>(cond)){
+            ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(cond);
+            cond = ice->getSubExpr();
+            if(cond && isa<BinaryOperator>(cond)){
+                BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(cond);
+                Expr* rhs = bo->getRHS();
+                if(rhs && isa<ImplicitCastExpr>(rhs)){
+                    ImplicitCastExpr* ice2 = dyn_cast_or_null<ImplicitCastExpr>(rhs);
+                    rhs = ice2->getSubExpr();
+                }
+                // 是二元运算符，且rhs为bool型，说明存在优先级问题
+                if(rhs->getType()->isBooleanType()){
+                    string ops = bo->getOpcodeStr().str();
+                    string message = "Check priority in conditional expression '"+expr2str(co)+"', the operator '"+ops+"' has more priority than '?:'!";
+                    addViolation(co, this, message);
+                }
+                    
+            }
         }
         return true;
     }
 
+private:
+    std::string expr2str(Expr *expr) {
+        // (T, U) => "T,,"
+        string text = clang::Lexer::getSourceText(
+            CharSourceRange::getTokenRange(expr->getSourceRange()), *sm, LangOptions(), 0);
+        if (text.size()>0&&text.at(text.size()-1) == ',')
+            return clang::Lexer::getSourceText(CharSourceRange::getCharRange(expr->getSourceRange()), *sm, LangOptions(), 0);
+        return text;
+    }
+
+private:
+    SourceManager* sm;
 };
 
 static RuleSet rules(new LowerPriorityOfConditionalExpressionRule());

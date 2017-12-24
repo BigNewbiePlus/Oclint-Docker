@@ -25,5 +25,6 @@ int main()
    
     if(a==NULL||a=='\0'){
     }
-    c=MIN(a,a);    
+    c=MIN(a,a);   
+    return 0;
 }

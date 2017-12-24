@@ -4,8 +4,9 @@
 using namespace std;
 
 void strTest(string a, string b){}
-void test(char* a, char* b)
-{}
+void test(char* a, char* b){}
+
+void trueTest(int a, int b){}
 
 class Person{
     public:
@@ -14,11 +15,14 @@ class Person{
 int main()
 {   
     char* a;
+    Person* lily;
+    
     test(a,a);
     string str;
     strTest(str,str);
-    Person* lily;
-
     strcmp(lily->name.c_str(), lily->name.c_str());
+    
+    trueTest(1, 1);
+
     return 0;
 }

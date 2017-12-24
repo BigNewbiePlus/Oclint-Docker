@@ -89,19 +89,52 @@ public:
         }
         return false;
     }
-    /* Visit BinaryOperator */
-    bool VisitBinaryOperator(BinaryOperator *bo)
+    /* Visit IfStmt */
+    bool VisitIfStmt(IfStmt* is)
     {
-        if(bo->getOpcode()==BO_Or){
-            if(isNonZeroValue(bo->getLHS())){
-                string message= "Consider inspecting the condition. The '"+expr2str(bo->getLHS())+"' argument of the '|' bitwise operation contains a non-zero value.";
-                addViolation(bo, this, message);
-            }else if(isNonZeroValue(bo->getRHS())){
-                string message = "Consider inspecting the condition. The '"+expr2str(bo->getRHS())+"' argument of the '|' bitwise operation contains a non-zero value.";
-                addViolation(bo, this, message);
-            }
-        }
+        checkCond(is->getCond());
         return true;
+    }
+
+    /* Visit WhileStmt */
+    bool VisitWhileStmt(WhileStmt* ws)
+    {
+        checkCond(ws->getCond());
+        return true;
+    }
+
+    /* Visit DoStmt */
+    bool VisitDoStmt(DoStmt* ds)
+    {
+        checkCond(ds->getCond());
+        return true;
+    }
+
+    inline void checkCond(Expr* expr){
+       if(isa<ImplicitCastExpr>(expr)){
+           ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
+           expr = ice->getSubExpr();
+       } 
+       if(isa<ParenExpr>(expr)){
+           ParenExpr* pe = dyn_cast_or_null<ParenExpr>(expr);
+           expr = pe->getSubExpr();
+       }
+       if(isa<BinaryOperator>(expr)){
+           BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(expr);
+           BinaryOperatorKind bok = bo->getOpcode();
+           if(bok==BO_LAnd || bok==BO_LOr){
+               checkCond(bo->getLHS());
+               checkCond(bo->getRHS());
+           }else if(bok==BO_Or){
+                if(isNonZeroValue(bo->getLHS())){
+                    string message= "Consider inspecting the condition. The '"+expr2str(bo->getLHS())+"' argument of the '|' bitwise operation contains a non-zero value.";
+                    addViolation(bo, this, message);
+                }else if(isNonZeroValue(bo->getRHS())){
+                    string message = "Consider inspecting the condition. The '"+expr2str(bo->getRHS())+"' argument of the '|' bitwise operation contains a non-zero value.";
+                    addViolation(bo, this, message);
+                }
+           }
+       }
     }
     string expr2str(Expr* expr){
         // (T, U) => "T,,"

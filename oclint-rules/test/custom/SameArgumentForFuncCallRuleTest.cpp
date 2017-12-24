@@ -12,6 +12,7 @@ TEST(SameArgumentForFuncCallRuleTest, PropertyTest)
 TEST(SameArgumentForFuncCallRuleTest, NoViolationInstance)    
 {
     testRuleOnCode(new SameArgumentForFuncCallRule(), "void m(char* a, char* b){}void test(){char*a;char* b;m(a,b);}");
+    testRuleOnCode(new SameArgumentForFuncCallRule(), "void m(int a, int b){}void test(){m(0,0);}");
 }
 
 TEST(SameArgumentForFuncCallRuleTest, Test1)

@@ -83,13 +83,17 @@ public:
     virtual void tearDown() override {}
 
     /* Visit ConditionalOperator */
-    bool VisitConditionalOperator(ConditionalOperator *conditionalOperator)
+    bool VisitConditionalOperator(ConditionalOperator *co)
     {
-        Expr* trueExpr = conditionalOperator->getTrueExpr();
-        Expr* falseExpr = conditionalOperator->getFalseExpr();
-        if(trueExpr && falseExpr && expr2str(trueExpr) == expr2str(falseExpr)){
-            string message = "The '?:' operator, regardless of its conditional expression, always returns one and the same value.";
-            addViolation(conditionalOperator, this, message);
+        Expr* trueExpr = co->getTrueExpr();
+        Expr* falseExpr = co->getFalseExpr();
+        if(trueExpr && falseExpr){
+            string str1 = expr2str(trueExpr);
+            string str2 = expr2str(falseExpr);
+            if(str1.size() && str2.size() && str1==str2){
+                string message = "the conditional operation '"+expr2str(co)+"' always returns the same value '"+str1+"'.";
+                addViolation(co, this, message);
+            }
         }
         return true;
     }

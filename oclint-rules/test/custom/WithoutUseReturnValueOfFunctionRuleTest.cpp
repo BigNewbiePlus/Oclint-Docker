@@ -12,17 +12,22 @@ TEST(WithoutUseReturnValueOfFunctionRuleTest, PropertyTest)
 TEST(WithoutUseReturnValueOfFunctionRuleTest, NoViolationInstance)    
 {
     
-    testRuleOnCode(new WithoutUseReturnValueOfFunctionRule(), "void m(){} void foo(){m();}");
+    testRuleOnCXXCode(new WithoutUseReturnValueOfFunctionRule(), "void m(){} void foo(){m();}");
+    testRuleOnCXXCode(new WithoutUseReturnValueOfFunctionRule(), 
+            "#include<vector>\n"
+            "using namespace std;"
+            "void foo(){vector<int> a;a.push_back(10);}");
 }
-
 TEST(WithoutUseReturnValueOfFunctionRuleTest, Test1)
 {
          
-    testRuleOnCode(new WithoutUseReturnValueOfFunctionRule(),
-                   "int num(){return 1;}\n"
-                      "void foo(){\nnum();}",
-            0, 3, 1, 3, 5, "The return value of function 'num' is required to be utilized.");
+    testRuleOnCXXCode(new WithoutUseReturnValueOfFunctionRule(),
+                   "#include<vector>\n"
+                   "using namespace std;\n"
+                      "void foo(){vector<int> a;\na.back();}",
+            0, 4, 1, 4, 8, "The return value of function 'back' is required to be utilized.");
 }
+
 
 TEST(WithoutUseReturnValueOfFunctionRuleTest, Test2)
 {

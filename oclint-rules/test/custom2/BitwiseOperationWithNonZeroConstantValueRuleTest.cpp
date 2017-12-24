@@ -35,6 +35,6 @@ TEST(BitwiseOperationWithNonZeroConstantValueRuleTest, Test2)
     testRuleOnCXXCode(new BitwiseOperationWithNonZeroConstantValueRule(), 
             "#define MONKEY 0x0002\n"
             "void m(){"
-            "int a; \nint b=a|MONKEY;}",0, 3, 7, 3, 9, "Consider inspecting the condition. The 'MONKEY' argument of the '|' bitwise operation contains a non-zero value.");
+            "int a; \nif((a&MONKEY) && (\na|MONKEY)){}}",0, 4, 1, 4, 3, "Consider inspecting the condition. The 'MONKEY' argument of the '|' bitwise operation contains a non-zero value.");
 }
 

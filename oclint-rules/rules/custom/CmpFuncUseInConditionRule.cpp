@@ -1,6 +1,6 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
-
+#include <set>
 using namespace std;
 using namespace clang;
 using namespace oclint;
@@ -76,7 +76,10 @@ public:
     */
 #endif
 
-    virtual void setUp() override {}
+    virtual void setUp() override {
+        string names[] = {"strcmp", "memcmp"};
+        cmpFun.insert(names, names+2);
+    }
     virtual void tearDown() override {}
     /* Visit IfStmt */
     bool VisitIfStmt(IfStmt *ifStmt)
@@ -93,17 +96,15 @@ public:
     
 private:
     CallExpr* getCmpExpr(Expr* expr){
-        
-        CallExpr* callExpr = NULL;
         while(expr){
-          
             if(isa<BinaryOperator>(expr)){           
                 BinaryOperator* bo = dyn_cast_or_null<BinaryOperator>(expr);
                 BinaryOperatorKind bok = bo->getOpcode();
             
                 if(bok==BO_LAnd||bok==BO_LOr){
-                    callExpr = getCmpExpr(bo->getLHS());
+                    CallExpr* callExpr = getCmpExpr(bo->getLHS());
                     if(!callExpr) callExpr = getCmpExpr(bo->getRHS());
+                    return callExpr;
                 }
                 break;
         
@@ -114,16 +115,22 @@ private:
                 ParenExpr* parenExpr = dyn_cast_or_null<ParenExpr>(expr);
                 expr = parenExpr->getSubExpr();
             }else if(isa<CallExpr>(expr)){
-                callExpr = dyn_cast_or_null<CallExpr>(expr);
-                string funcName = callExpr->getDirectCallee()->getNameInfo().getAsString();
-                if(funcName=="strcmp" || funcName=="memcmp")return callExpr;
+                CallExpr* callExpr = dyn_cast_or_null<CallExpr>(expr);
+                FunctionDecl* fd = callExpr->getDirectCallee();
+                if(fd){
+                    string funName = fd->getNameInfo().getAsString();
+                    if(cmpFun.find(funName)!=cmpFun.end()){
+                        return callExpr;
+                    }
+                }
                 break;
-            }else{
+            }else
                 break;
-            }  
         }
-        return callExpr;
+        return NULL;
     }
+private:
+    set<string> cmpFun;
 };
 
 static RuleSet rules(new CmpFuncUseInConditionRule()); 

@@ -82,17 +82,20 @@ public:
     virtual void tearDown() override {}
     
     /* Visit BinaryOperator */
-    bool VisitBinaryOperator(BinaryOperator *binaryOperator)
+    bool VisitBinaryOperator(BinaryOperator *bo)
     {
-        if(binaryOperator->getOpcode()==BO_Assign){
-            Expr* lhs = binaryOperator->getLHS();
-            Expr* rhs = binaryOperator->getRHS();
-            
-            string lhsStr = expr2str(lhs);
-            string rhsStr = expr2str(rhs);
-            if(lhsStr == rhsStr){
-                string message = "The "+lhsStr+" variable is assigned to itself.";
-                addViolation(binaryOperator, this, message);
+        if(bo->getOpcode()==BO_Assign){
+            Expr* lhs = bo->getLHS();
+            Expr* rhs = bo->getRHS();
+           
+            if(lhs && rhs){
+                string lhsStr = expr2str(lhs);
+                string rhsStr = expr2str(rhs);
+                string ops = bo->getOpcodeStr().str();
+                if(lhsStr.size() && rhsStr.size() && lhsStr == rhsStr){
+                    string message = "The '"+lhsStr+"' variable is assigned to itself in expression '"+lhsStr+ops+rhsStr+"'!";
+                    addViolation(bo, this, message);
+                }
             }
         }
         return true;

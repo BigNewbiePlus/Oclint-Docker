@@ -93,7 +93,7 @@ public:
                 if(binaryOperator->getOpcode()==BO_Assign){
                     curLHS = expr2str(binaryOperator->getLHS());
                     curRHS = expr2str(binaryOperator->getRHS());
-                    if(curLHS==preRHS && curRHS==preLHS){
+                    if(preLHS.size() && preRHS.size() && curLHS==preRHS && curRHS==preLHS){
                         string message ="An odd sequence of assignments of this kind: A = B; B = A;.";
                         addViolation(*it, this, message);
                         return true;

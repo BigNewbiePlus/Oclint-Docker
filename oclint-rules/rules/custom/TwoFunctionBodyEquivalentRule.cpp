@@ -1,6 +1,8 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
 #include "clang/Lex/Lexer.h"
+#include<sstream>
+
 using namespace std;
 using namespace clang;
 using namespace oclint;
@@ -88,22 +90,29 @@ public:
     {
         if(fd->hasBody()){
             Stmt* body = fd->getBody();
-            unsigned line1 = sm->getPresumedLineNumber(body->getLocStart());
-            unsigned line2 = sm->getPresumedLineNumber(body->getLocEnd()); 
-            unsigned delLine = line2-line1;
+            if(body && isa<CompoundStmt>(body)){
+                CompoundStmt* cs = dyn_cast_or_null<CompoundStmt>(body);
+                unsigned line1 = sm->getPresumedLineNumber(body->getLocStart());
+                unsigned line2 = sm->getPresumedLineNumber(body->getLocEnd()); 
 
-            if(delLine<=maxLineNum){
-                string bodyStr = stmt2str(body);
-                string funName = fd->getNameInfo().getAsString();
-                if(funcBody.find(delLine)!=funcBody.end() && funcBody[delLine].find(bodyStr)!=funcBody[delLine].end()){
-                    string message = "It is odd that the body of '"+funcBody[delLine][bodyStr]+"' function is fully equivalent to the body of '"+funName+"' function.";
-                    addViolation(fd, this, message);
-                    return false;
-                }else
-                    funcBody[delLine][bodyStr]=funName;
+                if(cs->size()>0 && line2-line1<=maxLineNum){
+                    string bodyStr = stmt2str(body);
+                    string funName = fd->getNameInfo().getAsString();
+                    stringstream ss;
+                    ss<<funName<<"(line:"<<line1<<"-"<<line2<<")";
+                    string curFunInfo = ss.str();
+                    map<string, string>::iterator it = funBody.find(bodyStr);
+                    if(it!=funBody.end() && it->second != funName){
+
+                        string message = "It is odd that the body of '"+funInfo[it->second]+"' function is fully equivalent to the body of '"+curFunInfo+"' function.";
+                        addViolation(fd, this, message);
+                        return true;
+                    }else{
+                        funBody[bodyStr] = funName;
+                        funInfo[funName]=curFunInfo;
+                    }
+                }
             }
-            
-
         }
         return true;
     }
@@ -120,7 +129,8 @@ private:
     
 
 private:
-    map<unsigned, map<string, string>> funcBody;
+    map<string, string> funBody;
+    map<string, string> funInfo;
     SourceManager* sm;
     unsigned maxLineNum;
 };

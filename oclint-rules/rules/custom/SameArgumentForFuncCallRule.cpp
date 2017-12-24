@@ -82,6 +82,9 @@ public:
     }
     virtual void tearDown() override {}
 
+    bool isLiteral(Expr* expr){
+        return isa<IntegerLiteral>(expr) || isa<CharacterLiteral>(expr) || isa<FloatingLiteral>(expr) || isa<StringLiteral>(expr);
+    }
     /* Visit CallExpr */
     bool VisitCallExpr(CallExpr *callExpr)
     {
@@ -90,14 +93,16 @@ public:
         
         Expr* arg1 = callExpr->getArg(0);
         Expr* arg2 = callExpr->getArg(1);
+
+        if(!isLiteral(arg1) && !isLiteral(arg2)){
+            string arg1Str = expr2str(arg1);
+            string arg2Str = expr2str(arg2);
         
-        string arg1Str = expr2str(arg1);
-        string arg2Str = expr2str(arg2);
-        
-        if(arg1Str.size() && arg1Str==arg2Str){
-            string funcName = callExpr->getDirectCallee()->getNameInfo().getAsString();
-            string message = "The first argument of '"+funcName+"' function is equal to the second argument.";
-            addViolation(callExpr, this, message);
+            if(arg1Str.size() && arg1Str==arg2Str){
+                string funcName = callExpr->getDirectCallee()->getNameInfo().getAsString();
+                string message = "The first argument of '"+funcName+"' function is equal to the second argument.";
+                addViolation(callExpr, this, message);
+            }
         }
         return true;
     }
