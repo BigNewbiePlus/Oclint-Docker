@@ -13,6 +13,10 @@ TEST(ElseBlockWasPossibleForgottenOrCommentOutRuleTest, NoViolationInstance)
 {
     testRuleOnCXXCode(new ElseBlockWasPossibleForgottenOrCommentOutRule(),
             "void m(){int a;if(a>0){}else{}}");
+    testRuleOnCXXCode(new ElseBlockWasPossibleForgottenOrCommentOutRule(),
+            "void m(){int a;if(a>0)\na=10;\nelse\na=11;}");
+    testRuleOnCXXCode(new ElseBlockWasPossibleForgottenOrCommentOutRule(),
+            "void m(){int a;if(a>0)\na=10;\nelse\n\na=11;}");
 }
 
 TEST(ElseBlockWasPossibleForgottenOrCommentOutRuleTest, Test1)

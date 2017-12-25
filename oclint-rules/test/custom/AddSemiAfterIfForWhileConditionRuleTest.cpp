@@ -22,22 +22,22 @@ TEST(AddSemiAfterIfForWhileConditionRuleTest, Test1)
 {
          
     testRuleOnCode(new AddSemiAfterIfForWhileConditionRule(),                     
-                      "void foo(){for(int i=0;i<10;i++)\n;{}}",
-            0, 2, 1, 2, 1, "Odd semicolon ';' after 'for' operator.");
+                      "void foo(){\nfor(int i=0;i<10;i++);{}}",
+            0, 2, 1, 2, 22, "Odd semicolon ';' after 'for' operator.");
 }
 
 TEST(AddSemiAfterIfForWhileConditionRuleTest, Test2)
 {
          
     testRuleOnCode(new AddSemiAfterIfForWhileConditionRule(),                     
-                      "void foo(){int a;if(a<0)\n;{}}",
-            0, 2, 1, 2,1, "Odd semicolon ';' after 'if' operator.");
+                      "void foo(){int a;\nif(a<0);{}}",
+            0, 2, 1, 2,8, "Odd semicolon ';' after 'if' operator.");
 }
 
 TEST(AddSemiAfterIfForWhileConditionRuleTest, Test3)
 {
          
     testRuleOnCode(new AddSemiAfterIfForWhileConditionRule(),                     
-                      "void foo(){int a;while(a<0)\n;{}}",
-            0, 2, 1, 2,1, "Odd semicolon ';' after 'while' operator.");
+                      "void foo(){int a;\nwhile(a<0);\n  a=1;}",
+            0, 2, 1, 2,11, "Odd semicolon ';' after 'while' operator.");
 }

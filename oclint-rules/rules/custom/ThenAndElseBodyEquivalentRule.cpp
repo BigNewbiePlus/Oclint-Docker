@@ -87,7 +87,9 @@ public:
         Stmt* then = ifStmt->getThen();
         Stmt* els  = ifStmt->getElse();
         if(then && els){
-            if(stmt2str(then)==stmt2str(els)){
+            string str1 = stmt2str(then);
+            string str2 = stmt2str(els);
+            if(str1.size() && str2.size() && str1==str2){
                 addViolation(ifStmt, this, "The 'then' statement is equivalent to the 'else' statement.");
             }
         }

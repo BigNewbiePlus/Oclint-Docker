@@ -79,24 +79,60 @@ public:
     virtual void setUp() override {}
     virtual void tearDown() override {}
 
+    bool hasReturnInCompound(Stmt* stmt){
+        if(isa<CompoundStmt>(stmt)){
+            CompoundStmt* cs = dyn_cast_or_null<CompoundStmt>(stmt);
+            for(CompoundStmt::body_iterator it=cs->body_begin(); it!=cs->body_end(); it++){
+                if(isa<ReturnStmt>(*it))return true;
+            }
+        }
+        return false;
+    }
+    bool hasReturnInEachBranch(Stmt* stmt)
+    {
+        if(isa<IfStmt>(stmt)){
+            IfStmt* is = dyn_cast_or_null<IfStmt>(stmt);
+            while(is){
+                Stmt* then = is->getThen();
+                if(!then)return false;
+                Stmt* els = is->getElse();
+                if(!els)return false;
+                
+                if(isa<CompoundStmt>(then)){
+                    if(!hasReturnInCompound(then))return false;
+                }else if(!isa<ReturnStmt>(then))return false;
+                
+                if(isa<CompoundStmt>(els)){
+                    return hasReturnInCompound(els);
+                }else if(isa<IfStmt>(els)){
+                    is = dyn_cast_or_null<IfStmt>(els);
+                }else{
+                    return isa<ReturnStmt>(els);
+                }
+            }
+            return true;
+        }
+        return false;
+    }
     bool hasReturnStmt(Stmt* stmt){
         if(stmt && isa<CompoundStmt>(stmt)){
             CompoundStmt* compoundStmt = dyn_cast_or_null<CompoundStmt>(stmt);
             for(CompoundStmt::body_iterator it=compoundStmt->body_begin(); it!=compoundStmt->body_end(); it++){
+                if(isa<IfStmt>(*it) && hasReturnInEachBranch(*it))return true;
                 if(isa<ReturnStmt>(*it))return true;
             }    
         }
         return false;
     }
     /* Visit FunctionDecl */
-    bool VisitFunctionDecl(FunctionDecl *functionDecl)
+    bool VisitFunctionDecl(FunctionDecl *fd)
     {
         //是定义处且有返回值
-        if(functionDecl->hasBody() && functionDecl->getReturnType()->isVoidType()==false){
-            Stmt* stmt = functionDecl->getBody();
+        if(fd->hasBody() &&  fd->isThisDeclarationADefinition() && fd->getReturnType()->isVoidType()==false){
+            Stmt* stmt = fd->getBody();
             if(stmt && !hasReturnStmt(stmt)){
                 string message = "Non-void function should return a value.";
-                addViolation(functionDecl, this, message);
+                addViolation(fd, this, message);
             }
         }
         return true;

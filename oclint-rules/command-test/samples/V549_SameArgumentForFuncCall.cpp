@@ -23,6 +23,6 @@ int main()
     strcmp(lily->name.c_str(), lily->name.c_str());
     
     trueTest(1, 1);
-
+    trueTest('a', 'a');
     return 0;
 }

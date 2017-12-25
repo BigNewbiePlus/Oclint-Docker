@@ -83,15 +83,15 @@ public:
     virtual void tearDown() override {}
 
     /* Visit BinaryOperator */
-    bool VisitBinaryOperator(BinaryOperator *binaryOperator)
+    bool VisitBinaryOperator(BinaryOperator *bo)
     {
-        BinaryOperatorKind bok = binaryOperator->getOpcode();
-        if(bok==BO_And || bok==BO_Or || bok==BO_Or){
-            string lhsStr = expr2str(binaryOperator->getLHS());
-            string rhsStr = expr2str(binaryOperator->getRHS());
-            if(lhsStr == rhsStr){
-                string message = "An odd bitwise operation detected: "+expr2str(binaryOperator)+". Consider verifying it.";
-                addViolation(binaryOperator, this, message);
+        BinaryOperatorKind bok = bo->getOpcode();
+        if(bok==BO_And || bok==BO_Or){
+            string str1 = expr2str(bo->getLHS());
+            string str2 = expr2str(bo->getRHS());
+            if(str1.size() && str2.size() && str1==str2){
+                string message = "An odd bitwise operation detected: "+expr2str(bo)+". Consider verifying it.";
+                addViolation(bo, this, message);
             }
         }
         return true;

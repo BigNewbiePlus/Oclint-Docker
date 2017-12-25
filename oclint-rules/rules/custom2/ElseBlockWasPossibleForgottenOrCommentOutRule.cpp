@@ -87,7 +87,7 @@ public:
         Stmt* then = is->getThen();
         Stmt* els = is->getElse();
 
-        if(then && els){
+        if(then && els && isa<IfStmt>(els)){
             SourceLocation thenEnd   = then->getLocEnd();
             SourceLocation elsStart  = els->getLocStart();
             unsigned row1 = sm->getPresumedLineNumber(thenEnd);

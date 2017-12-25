@@ -91,14 +91,16 @@ public:
                 Stmt* stmt = *it;
                 if(isa<IfStmt>(stmt)){
                     IfStmt* nestIfStmt = dyn_cast_or_null<IfStmt>(stmt);
-                    if(condStr == expr2str(nestIfStmt->getCond())){
+                    string str2 = expr2str(nestIfStmt->getCond());
+                    if(str2.size() && condStr == str2){
                         return true;
                     }
                 }
             }
         }else if(isa<IfStmt>(then)){
             IfStmt* nestIfStmt = dyn_cast_or_null<IfStmt>(then);
-            if(condStr == expr2str(nestIfStmt->getCond())){
+            string str2 = expr2str(nestIfStmt->getCond());
+            if(str2.size() && condStr == str2){
                 return true;
             }
         }
@@ -111,7 +113,7 @@ public:
         Stmt* then = ifStmt->getThen();
         if(expr && then){
             string condStr = expr2str(expr);
-            if(recurCheck(condStr, then)){
+            if(condStr.size() && recurCheck(condStr, then)){
                 string message = "Recurring check. The IF Condition '"+condStr+"' check twice.";
                 addViolation(ifStmt, this, message);
             }

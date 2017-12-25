@@ -86,7 +86,7 @@ public:
     bool VisitBinaryOperator(BinaryOperator *bo)
     {
         BinaryOperatorKind bok = bo->getOpcode();
-        if(bok!=BO_PtrMemD && bok!=BO_PtrMemI && bok!=BO_Comma){
+        if(bok!=BO_PtrMemD && bok!=BO_PtrMemI && bok!=BO_Comma && bok!=BO_Mul){
             Expr* lhs = bo->getLHS();    
             Expr* rhs = bo->getRHS();
         

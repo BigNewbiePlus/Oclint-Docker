@@ -76,35 +76,57 @@ public:
     */
 #endif
 
-    virtual void setUp() override {}
+    virtual void setUp() override {
+        sm = &_carrier->getSourceManager();
+    }
     virtual void tearDown() override {}
-    inline void checkBody(Stmt* stmt, string stmtType){
-        if(stmt && isa<NullStmt>(stmt)){
-            string message = "Odd semicolon ';' after '"+stmtType+"' operator.";
-            addViolation(stmt,this,message);
+    
+    /* Visit CompoundStmt */
+    bool VisitCompoundStmt(CompoundStmt* cs)
+    {
+        if(cs->size()>=2){
+            for(CompoundStmt::body_iterator it=cs->body_begin(); it!=cs->body_end(); it++){
+                if((isa<IfStmt>(*it) || isa<WhileStmt>(*it) || isa<ForStmt>(*it)) && it+1!=cs->body_end()){
+                    Stmt* body = NULL;
+                    string stmtType="";
+                    if(isa<IfStmt>(*it)){
+                        IfStmt* is = dyn_cast_or_null<IfStmt>(*it);
+                        body = is->getThen();
+                        stmtType="if";
+                    }else if(isa<WhileStmt>(*it)){
+                        WhileStmt* ws = dyn_cast_or_null<WhileStmt>(*it);
+                        body = ws->getBody();
+                        stmtType="while";
+                    }else if(isa<ForStmt>(*it)){
+                        ForStmt* fs = dyn_cast_or_null<ForStmt>(*it);
+                        body = fs->getBody();
+                        stmtType="for";
+                    }
+                    if(body && isa<NullStmt>(body)){
+                        SourceLocation sl1 = (*it)->getLocStart();
+                        SourceLocation sl2 = (*(it+1))->getLocStart();
+                        
+                        unsigned row1 = sm->getSpellingLineNumber(sl1);
+                        unsigned col1 = sm->getSpellingColumnNumber(sl1);
+                        
+                        unsigned row2 = sm->getSpellingLineNumber(sl2);
+                        unsigned col2 = sm->getSpellingColumnNumber(sl2);
+
+                        if(isa<CompoundStmt>(*(it+1)) || (row1+1==row2 && col1<col2)){
+                            
+                            string message = "Odd semicolon ';' after '"+stmtType+"' operator.";
+                            addViolation(*it,this,message);
+                        }
+                    }
+                    
+                }
+            }
         }
-        
-    }
-    /* Visit IfStmt */
-    bool VisitIfStmt(IfStmt *node)
-    {
-        checkBody(node->getThen(), "if");
         return true;
     }
-     
-    /* Visit WhileStmt */
-    bool VisitWhileStmt(WhileStmt *node)
-    {
-        checkBody(node->getBody(), "while");
-        return true;
-    }
-     
-    /* Visit ForStmt */
-    bool VisitForStmt(ForStmt *node)
-    {
-        checkBody(node->getBody(), "for");
-        return true;
-    }
+
+private:
+    SourceManager* sm;
      
 };
 

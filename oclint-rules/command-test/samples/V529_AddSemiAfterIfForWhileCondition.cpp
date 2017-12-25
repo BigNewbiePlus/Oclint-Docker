@@ -10,9 +10,7 @@ void foo()
         
     }
     if(a<10);
-    {
-        
-    }
+        a=10;
 }
 int main()
 {

@@ -98,8 +98,8 @@ BUILD_DYNAMIC_RULES("${BuildTwoIfStmtWithIdenticalCondtionRule}")
 SET(BuildOperationExecuted3TimesInSuccessionRule OperationExecuted3TimesInSuccession)
 BUILD_DYNAMIC_RULES("${BuildOperationExecuted3TimesInSuccessionRule}")
 
-SET(BuildStringOfTwoPartsUsedForArrayInitializationRule StringOfTwoPartsUsedForArrayInitialization)
-BUILD_DYNAMIC_RULES("${BuildStringOfTwoPartsUsedForArrayInitializationRule}")
+#SET(BuildStringOfTwoPartsUsedForArrayInitializationRule StringOfTwoPartsUsedForArrayInitialization)
+#BUILD_DYNAMIC_RULES("${BuildStringOfTwoPartsUsedForArrayInitializationRule}")
 
 SET(BuildConditionOfLoopAlwaysTrueOrFalseRule ConditionOfLoopAlwaysTrueOrFalse)
 BUILD_DYNAMIC_RULES("${BuildConditionOfLoopAlwaysTrueOrFalseRule}")

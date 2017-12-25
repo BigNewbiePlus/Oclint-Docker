@@ -116,7 +116,7 @@ public:
             string name2;
             if(getAssignPattern(expr, name2)){
                 string name1 = vd->getNameAsString();
-                if(name1==name2){
+                if(name1.size() && name1==name2){
                     string message = "Consider inspecting the 'T foo = foo = x;' expression. It is odd that variable is initialized through itself.";
                     addViolation(vd, this, message);
                 }

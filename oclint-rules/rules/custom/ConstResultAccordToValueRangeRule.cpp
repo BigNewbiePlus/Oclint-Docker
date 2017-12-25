@@ -83,64 +83,65 @@ public:
     virtual void tearDown() override {}
 
     /* Visit BinaryOperator */
-    bool VisitBinaryOperator(BinaryOperator *binaryOperator)
+    bool VisitBinaryOperator(BinaryOperator *bo)
     {
-        BinaryOperatorKind bok = binaryOperator->getOpcode();
+        BinaryOperatorKind bok = bo->getOpcode();
         if(bok==BO_LT || bok==BO_GT || bok==BO_LE || bok==BO_GE|| bok==BO_EQ || bok==BO_NE){
-            Expr* lhs = binaryOperator->getLHS();
-            Expr* rhs = binaryOperator->getRHS();
+            Expr* lhs = bo->getLHS();
+            Expr* rhs = bo->getRHS();
+
+            if(lhs && rhs){
+                int type1=-1, type2=-1;//0:char,1:unsigned,2:int,-1:其他
+                int value1=0, value2=0;//type=2,
+                
             
-            int type1,type2;//0:char,1:unsigned,2:int,-1:其他
-            int value1,value2;//type=2,
-        
-        
-            getTypeAndValue(lhs,type1,value1);
-            getTypeAndValue(rhs,type2,value2);
-            
-            if(type1!=-1 && type2!=-1){
-                if(type1==2 && type2!=2){
-                    int tmp; tmp = type1,type1=type2,type2=tmp;
-                    value2 = value1;
-                    if(bok==BO_LT)bok=BO_GT;
-                    else if(bok==BO_GT)bok==BO_LT;
-                    else if(bok==BO_LE)bok=BO_GE;
-                    else if(bok==BO_GE)bok=BO_LE;
-                }
-                if(type1!=2 && type2==2){
-                    string str, result;
-                    if(!getViolationString(type1, value2, bok, str, result))return true;
-                    
-                    string exprStr = expr2str(binaryOperator);    
-                    string message = "Expression '"+exprStr+"' is always "+result+". "+str;    
-                    addViolation(binaryOperator,this, message);
+                if(isRangeValue(lhs, type1, value1) && isRangeValue(rhs, type2, value2)){
+                    if(type1==2 && type2!=2){
+                        swap(type1, type2);
+                        value2 = value1;
+                        if(bok==BO_LT)bok=BO_GT;
+                        else if(bok==BO_GT)bok=BO_LT;
+                        else if(bok==BO_LE)bok=BO_GE;
+                        else if(bok==BO_GE)bok=BO_LE;
+                    }
+                    if(type1!=2 && type2==2){
+                        string str, result;
+                        if(getViolation(type1, value2, bok, str, result)){
+                            string exprStr = expr2str(bo);    
+                            string message = "Expression '"+exprStr+"' is always "+result+". "+str;    
+                            addViolation(bo, this, message);
+                        }
+                    }
                 }
             }
         }
         return true;
     }
 private:
-    void getTypeAndValue(Expr* expr,int& type,int& value)//0:char,1:unsigned,2:int,-1:其他
+    bool isRangeValue(Expr* expr,int& type,int& value)//0:char,1:unsigned,2:int,-1:其他
     {
         //ImplicitCastExpr
-        if(expr && isa<ImplicitCastExpr>(expr)){
-            ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
-            expr= implicitCastExpr->getSubExpr();
+        if(isa<ImplicitCastExpr>(expr)){
+            ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
+            expr= ice->getSubExpr();
         }
         
-        if(expr && isa<IntegerLiteral>(expr)){
-            IntegerLiteral* integerLiteral = dyn_cast<IntegerLiteral>(expr);
+        if(isa<IntegerLiteral>(expr)){
+            IntegerLiteral* il = dyn_cast_or_null<IntegerLiteral>(expr);
             type=2;
-            value = integerLiteral->getValue().getSExtValue();
-        
-        }else if(expr && expr->getType()->isCharType()){
-                type=0;     
-        }else if(expr && expr->getType()->isUnsignedIntegerType()){    
+            value = il->getValue().getSExtValue();
+            return true;
+        }else if(expr->getType()->isCharType()){
+            type=0;     
+            return true;
+        }else if(expr->getType()->isUnsignedIntegerType()){    
             type=1;     
-        }else
-            type=-1;
+            return true;
+        }
+        return false;
     }
     
-    bool getViolationString(int type, int value, BinaryOperatorKind bok, string& str, string& result)
+    bool getViolation(int type, int value, BinaryOperatorKind bok, string& str, string& result)
     {
         //0:char,1:unsigned,2:int,-1:其他
         if(type==0){
@@ -182,27 +183,22 @@ private:
                 case BO_LT:
                     if(value<=0)result="false";
                     else return false;
-                     str+= "<"+value;
                     break;
                 case BO_GT:
                     if(value<0)result="true";
                     else return false;
-                     str+= ">"+value;
                     break;
                 case BO_LE:
                     if(value<0)result="false";
                     else return false;
-                     str+= "<="+value;
                     break;
                 case BO_GE:
                     if(value<=0)result="true";
                     else return false;
-                     str+= ">="+value;
                     break;
                 case BO_EQ:
                     if(value<0)result="false";
                     else return false;
-                     str+= "=="+value;
                     break;
                 case BO_NE:
                     if(value<0)result="true";

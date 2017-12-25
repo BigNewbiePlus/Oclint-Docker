@@ -80,14 +80,33 @@ public:
     }
     virtual void tearDown() override {}
 
-    bool isSameFormat(Stmt* stmt1, Stmt* stmt2){
-        SourceLocation sl1 = stmt1->getLocStart();
-        SourceLocation sl2 = stmt2->getLocStart();
-        unsigned row1 = sm->getSpellingLineNumber(sl1);
-        unsigned col1 = sm->getSpellingColumnNumber(sl1);
-        unsigned row2 = sm->getSpellingLineNumber(sl2);
-        unsigned col2 = sm->getSpellingColumnNumber(sl2);
-        if(row1==row2 || (row1+1==row2 && col1==col2))return true;
+    bool isLoseCurly(IfStmt* is, Stmt* stmt1, Stmt* stmt2){
+        
+        SourceLocation s1SSL = is->getLocStart(); //if起始语句
+        
+        SourceLocation s2SSL = stmt1->getLocStart();//if后第一个语句起始位置
+        SourceLocation s2ESL = stmt1->getLocEnd();//终止位置
+
+        SourceLocation s3SSL = stmt2->getLocStart();//if后第二个语句起始位置
+        SourceLocation s3ESL = stmt2->getLocEnd();//终止位置
+        
+        unsigned s1SRow = sm->getSpellingLineNumber(s1SSL); //if的行列
+        unsigned s1SCol = sm->getSpellingColumnNumber(s1SSL);
+
+        unsigned s2SRow = sm->getSpellingLineNumber(s2SSL); //第一个语句起始行
+        unsigned s2SCol = sm->getSpellingColumnNumber(s2SSL);//起始列
+        unsigned s2ERow = sm->getSpellingLineNumber(s2ESL); //第一个语句终止行
+        unsigned s2ECol = sm->getSpellingColumnNumber(s2ESL);//终止列
+        
+        unsigned s3SRow = sm->getSpellingLineNumber(s3SSL); //第一个语句起始行
+        unsigned s3SCol = sm->getSpellingColumnNumber(s3SSL);//起始列
+        unsigned s3ERow = sm->getSpellingLineNumber(s3ESL); //第一个语句终止行
+        unsigned s3ECol = sm->getSpellingColumnNumber(s3ESL);//终止列
+
+        if(s2SRow==s2ERow && s3SRow==s3ERow){//第二条和第三条语句起始和终止都在同一行
+            if(s2SRow==s3SRow)return true;
+            if(s1SRow+1==s2SRow && s2SRow+1==s3SRow && s2SCol==s3SCol && s1SCol<s2SCol)return true;
+        }
         return false;
     }
     /* Visit CompoundStmt */
@@ -97,13 +116,13 @@ public:
         
         for(CompoundStmt::body_iterator it=cs->body_begin(); it!=cs->body_end();it++){
             if(isa<IfStmt>(*it)){
-                IfStmt* ifStmt = dyn_cast_or_null<IfStmt>(*it);
-                Stmt* then = ifStmt->getThen();
-                if(then && !ifStmt->getElse() && !isa<CompoundStmt>(then) && (it+1!=cs->body_end())){//if语句没else分支且then无括号
+                IfStmt* is = dyn_cast_or_null<IfStmt>(*it);
+                Stmt* then = is->getThen();
+                if(then && !isa<CompoundStmt>(then) && !is->getElse() && (it+1!=cs->body_end())){//if语句没else分支且then无括号
                     Stmt* nextStmt = *(it+1);
-                    if(isSameFormat(then, nextStmt)){
+                    if(is && then && nextStmt && isLoseCurly(is, then, nextStmt)){
                         string message= "The code's operational logic does not correspond with its formatting. The statement is indented to the right, but it is always executed. It is possible that curly brackets are missing.";
-                        addViolation(ifStmt, this, message);
+                        addViolation(is, this, message);
                     }
                 }
             }

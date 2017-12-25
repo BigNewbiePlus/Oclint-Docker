@@ -83,14 +83,23 @@ public:
     virtual void tearDown() override {}
 
     bool isLiteral(Expr* expr){
+        if(isa<ImplicitCastExpr>(expr)){
+            ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
+            expr = ice->getSubExpr();
+        }
         return isa<IntegerLiteral>(expr) || isa<CharacterLiteral>(expr) || isa<FloatingLiteral>(expr) || isa<StringLiteral>(expr);
     }
     /* Visit CallExpr */
     bool VisitCallExpr(CallExpr *callExpr)
     {
         unsigned num = callExpr->getNumArgs();
-        if(num<2)return true;
-        
+        FunctionDecl* fd = callExpr->getDirectCallee();
+        if(num<2 || !fd)return true;
+
+        string funName = fd->getNameInfo().getAsString();    
+        // 重造+/-/*/符号
+        if(funName.find("operator")!=string::npos)return true;
+
         Expr* arg1 = callExpr->getArg(0);
         Expr* arg2 = callExpr->getArg(1);
 
@@ -102,7 +111,9 @@ public:
                 string funcName = callExpr->getDirectCallee()->getNameInfo().getAsString();
                 string message = "The first argument of '"+funcName+"' function is equal to the second argument.";
                 addViolation(callExpr, this, message);
+                
             }
+            
         }
         return true;
     }
