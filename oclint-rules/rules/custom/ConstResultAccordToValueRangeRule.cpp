@@ -91,7 +91,7 @@ public:
             Expr* rhs = bo->getRHS();
 
             if(lhs && rhs){
-                int type1=-1, type2=-1;//0:char,1:unsigned,2:int,-1:其他
+                int type1=-1, type2=-1;//0:char,1:unsigned int,2:int,3:unsigned char,-1:其他
                 int value1=0, value2=0;//type=2,
                 
             
@@ -132,7 +132,11 @@ private:
             value = il->getValue().getSExtValue();
             return true;
         }else if(expr->getType()->isCharType()){
-            type=0;     
+            string typeStr = expr->getType().getAsString();
+            if(typeStr=="char")type=0;
+            else if(typeStr=="unsigned char")type=3;
+            else
+                return false;
             return true;
         }else if(expr->getType()->isUnsignedIntegerType()){    
             type=1;     
@@ -143,7 +147,7 @@ private:
     
     bool getViolation(int type, int value, BinaryOperatorKind bok, string& str, string& result)
     {
-        //0:char,1:unsigned,2:int,-1:其他
+        //0:char,1:unsigned int,2:int,3:unsigned char, -1:其他
         if(type==0){
             switch(bok){
                 case BO_LT:
@@ -208,7 +212,41 @@ private:
                     break;
             }
             str = "Unsigned type value is always >= 0.";           
-        }
+        }else if(type==3){ //[0, 255]
+            switch(bok){
+                case BO_LT:
+                    if(value<=0)result="false";
+                    else if(value>255)result="true";
+                    else return false;
+                    break;
+                case BO_GT:
+                    if(value<0)result="true";
+                    else if(value>=255)result="false";
+                    else return false;
+                    break;
+                case BO_LE:
+                    if(value<0)result="false";
+                    else if(value>=255)result="true";
+                    else return false;
+                    break;
+                case BO_GE:
+                    if(value<=0)result="true";
+                    else if(value>255)result="false";
+                    else return false;
+                    break;
+                case BO_EQ:
+                    if(value<0||value>255)result="false";
+                    else return false;
+                    break;
+                case BO_NE:
+                    if(value<0||value>255)result="true";
+                    else return false;
+                    break;
+                default:
+                    break;
+            }
+            str = "The value range of unsigned char type: [0, 255].";
+        } 
         return true;
     }
     

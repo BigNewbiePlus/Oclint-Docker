@@ -1,5 +1,5 @@
 #include<cstddef>
-void foo()
+int main()
 {
     int nBytes = 10;
     char* pBytes = new char[ nBytes ];
@@ -9,30 +9,15 @@ void foo()
        pBytes[2] == 0xBF )
     {
     }
-}
-
-void foo2(){
+    
     size_t nNumChars;
     if (nNumChars > 0){
     }
-}
-
-void foo3()
-{
-    typedef unsigned short wint_t;
-    wint_t c;
-    if (c < 0){
-        
-    }
-}
-
-void foo4()
-{
     char* s;
     if (*s > 127) *s = '~';
-}
-int main()
-{
-    
+
+    char* cursor_;
+    if (static_cast<unsigned char>(*cursor_) != 0xef){
+    }
     return 0;
 }
