@@ -1,7 +1,7 @@
 #include "oclint/AbstractASTVisitorRule.h"
 #include "oclint/RuleSet.h"
 #include "clang/Lex/Lexer.h"
-    
+#include<sstream>    
 using namespace std;
 using namespace clang;
 using namespace oclint;
@@ -92,7 +92,7 @@ public:
 
             if(lhs && rhs){
                 int type1=-1, type2=-1;//0:char,1:unsigned int,2:int,3:unsigned char,-1:其他
-                int value1=0, value2=0;//type=2,
+                long value1=0, value2=0;//type=2,
                 
             
                 if(isRangeValue(lhs, type1, value1) && isRangeValue(rhs, type2, value2)){
@@ -108,7 +108,9 @@ public:
                         string str, result;
                         if(getViolation(type1, value2, bok, str, result)){
                             string exprStr = expr2str(bo);    
-                            string message = "Expression '"+exprStr+"' is always "+result+". "+str;    
+                            stringstream ss;
+                            ss<<value2;
+                            string message = "Expression '"+exprStr+"' is always "+result+". "+str+":"+ss.str();    
                             addViolation(bo, this, message);
                         }
                     }
@@ -118,34 +120,43 @@ public:
         return true;
     }
 private:
-    bool isRangeValue(Expr* expr,int& type,int& value)//0:char,1:unsigned,2:int,-1:其他
+    bool isRangeValue(Expr* expr,int& type,long& value)//0:char,1:unsigned,2:int,-1:其他
     {
         //ImplicitCastExpr
         if(isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* ice = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr= ice->getSubExpr();
         }
-        
+
+        string typeStr = expr->getType().getCanonicalType().getAsString();
+        int flag=1;
+        if(isa<UnaryOperator>(expr)){
+            UnaryOperator* uo = dyn_cast_or_null<UnaryOperator>(expr);
+            if(uo->getOpcode()==UO_Minus){
+                expr = uo->getSubExpr();
+                flag = -1;
+            }
+        }
         if(isa<IntegerLiteral>(expr)){
             IntegerLiteral* il = dyn_cast_or_null<IntegerLiteral>(expr);
             type=2;
-            value = il->getValue().getSExtValue();
+            value = il->getValue().getSExtValue()*flag;
             return true;
-        }else if(expr->getType()->isCharType()){
-            string typeStr = expr->getType().getAsString();
-            if(typeStr=="char")type=0;
-            else if(typeStr=="unsigned char")type=3;
-            else
-                return false;
+        }
+        if(typeStr=="char"){
+            type=0;
             return true;
-        }else if(expr->getType()->isUnsignedIntegerType()){    
-            type=1;     
+        }else if(typeStr=="unsigned char"){
+            type=3;
+            return true;
+        }else if(typeStr.substr(0, 8)=="unsigned"){
+            type=1;
             return true;
         }
         return false;
     }
     
-    bool getViolation(int type, int value, BinaryOperatorKind bok, string& str, string& result)
+    bool getViolation(int type, long value, BinaryOperatorKind bok, string& str, string& result)
     {
         //0:char,1:unsigned int,2:int,3:unsigned char, -1:其他
         if(type==0){

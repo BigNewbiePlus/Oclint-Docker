@@ -81,16 +81,20 @@ public:
 
     
     inline bool isUnsignedCharType(Expr* expr){
-        return expr && expr->getType()->isUnsignedIntegerType();
+        if(expr){
+                return true;
+        }
+        return false;
     }
 
     bool isOutOfUnsignedCharValue(Expr* expr, int& value){
         int flag=1;
-        if(expr && isa<ImplicitCastExpr>(expr)){
+        if(!expr)return true;
+        if(isa<ImplicitCastExpr>(expr)){
             ImplicitCastExpr* implicitCastExpr = dyn_cast_or_null<ImplicitCastExpr>(expr);
             expr = implicitCastExpr->getSubExpr();
         }
-        if(expr && isa<UnaryOperator>(expr)){
+        if(isa<UnaryOperator>(expr)){
             UnaryOperator* unaryOperator = dyn_cast_or_null<UnaryOperator>(expr);
             UnaryOperatorKind uok = unaryOperator->getOpcode();
             
@@ -100,7 +104,7 @@ public:
             expr = unaryOperator->getSubExpr();
         }
         
-        if(expr && isa<IntegerLiteral>(expr)){
+        if(isa<IntegerLiteral>(expr)){
             IntegerLiteral*  integerLiteral = dyn_cast_or_null<IntegerLiteral>(expr);
             value = integerLiteral->getValue().getSExtValue()*flag;
             if(value<0|| value>255)return true;
@@ -108,18 +112,37 @@ public:
         return false;
     }
     /* Visit BinaryOperator */
-    bool VisitBinaryOperator(BinaryOperator *binaryOperator)
+    bool VisitBinaryOperator(BinaryOperator *bo)
     {
         //当二元操作符是赋值符时‘=’
-        if(binaryOperator->getOpcode()==BO_Assign){
-            Expr* lhs = binaryOperator->getLHS();
-            Expr* rhs = binaryOperator->getRHS();
-            int value;
-            if(isUnsignedCharType(lhs) && isOutOfUnsignedCharValue(rhs, value)){
+        if(bo->getOpcode()==BO_Assign){
+            Expr* lhs = bo->getLHS();
+            Expr* rhs = bo->getRHS();
+            int value; 
+            string typeStr = lhs->getType().getCanonicalType().getAsString();
+            if(typeStr.find("unsigned char")!=string::npos && isOutOfUnsignedCharValue(rhs, value)){
                 stringstream ss;
                 ss<<value;
                 string message = "Truncation of constant value "+ss.str()+". The value range of unsigned char type: [0, 255].";
-                addViolation(binaryOperator, this, message);
+                addViolation(bo, this, message);
+            }
+        }
+        return true;
+    }
+
+    /* Visit VarDecl */
+    bool VisitVarDecl(VarDecl* vd)
+    {
+        if(vd->hasInit()){
+            string typeStr = vd->getType().getCanonicalType().getAsString();
+            if(typeStr.find("unsigned char")!=string::npos){
+                Expr* init = vd->getInit();
+                int value;
+                if(isOutOfUnsignedCharValue(init, value)){
+                    stringstream ss; ss<<value;
+                    string message = "Truncation of constant value "+ss.str()+". The value range of unsigned char type: [0, 255].";
+                    addViolation(vd, this, message);
+                }
             }
         }
         return true;
