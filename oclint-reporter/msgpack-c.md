@@ -1,7 +1,45 @@
 msgpack-c统计信息
 =======================
 ### k404(TwoFunctionBodyEquivalenit)
-main函数没有返回值<br>
+错误信息: non-void function 'main' 函数没有返回值<br>
+代码:
+```
+ int main(void)
+ {
+     {
+         old_class oc;
+         new_class nc;
+
+         std::stringstream sbuf;
+         msgpack::pack(sbuf, oc);
+
+         msgpack::object_handle oh =
+             msgpack::unpack(sbuf.str().data(), sbuf.str().size());
+         msgpack::object obj = oh.get();
+
+         obj.convert(nc);
+
+         std::cout << obj << " value=" << nc.value << " flag=" << nc.flag << std::endl;
+     }
+
+     {
+         new_class nc;
+         old_class oc;
+
+         std::stringstream sbuf;
+         msgpack::pack(sbuf, nc);
+
+         msgpack::object_handle oh =
+             msgpack::unpack(sbuf.str().data(), sbuf.str().size());
+         msgpack::object obj = oh.get();
+
+         obj.convert(oc);
+
+         std::cout << obj << " value=" << oc.value << std::endl;
+     }
+ }
+```
+另外还有10处同样情况
 ### k405(InvalidPointToLocalVariable)
 1.1 [msgpack-c/src/unpack.c 496](msgpack-c/src/unpack.c#L496)<br>
 错误信息: Pointer to local variable 'r' is stored outside the scope of this variable. Such a pointer will become invalid.<br>
