@@ -1,7 +1,7 @@
 xlearn统计信息
 =======================
 ### k405(InvalidPointToLocalVariable)
-1.1 [codebuilder.cpp 91](asmjit/src/asmjit/base/codebuilder.cpp)<br>
+1.1 [asmjit/src/asmjit/base/codebuilder.cpp 91](asmjit/src/asmjit/base/codebuilder.cpp#L91)<br>
 错误信息: Pointer to local variable 'node' is stored outside the scope of this variable. Such a pointer will become invalid.<br>
 代码:
 ```
@@ -19,7 +19,7 @@ Error CodeBuilder::getCBLabel(CBLabel** pOut, uint32_t id) noexcept {
    return kErrorOk;
  }
 ```
-1.2 [codeholder.cpp 282:3](asmjit/src/asmjit/base/codeholder.cpp)<br>
+1.2 [asmjit/src/asmjit/base/codeholder.cpp 282:3](asmjit/src/asmjit/base/codeholder.cpp#L282)<br>
 错误信息: Pointer to local variable 'node' is stored ...<br>
 代码:
 ```
@@ -41,7 +41,7 @@ Error CodeBuilder::getCBLabel(CBLabel** pOut, uint32_t id) noexcept {
    return kErrorOk;
  }
 ```
-1.3 [codeholder.cpp 414:3](asmjit/src/asmjit/base/codeholder.cpp)<br>
+1.3 [asmjit/src/asmjit/base/codeholder.cpp 414:3](asmjit/src/asmjit/base/codeholder.cpp#L414)<br>
 错误信息: Pointer to local variable 'link' is stored ...<br>
 代码:
 ```
@@ -61,7 +61,7 @@ LabelLink* CodeHolder::newLabelLink(LabelEntry* le, uint32_t sectionId, size_t o
    return link;
  }
 ```
-1.4 [codeholder.cpp 556:3](asmjit/src/asmjit/base/codeholder.cpp)<br>
+1.4 [asmjit/src/asmjit/base/codeholder.cpp 556:3](asmjit/src/asmjit/base/codeholder.cpp#L556)<br>
 错误信息: Pointer to local variable 're' is stored ...<br>
 代码:
 ```
@@ -88,7 +88,7 @@ LabelLink* CodeHolder::newLabelLink(LabelEntry* le, uint32_t sectionId, size_t o
  }
 
 ```
-1.5 [constpool.cpp 101:5](asmjit/src/asmjit/base/constpool.cpp)<br>
+1.5 [asmjit/src/asmjit/base/constpool.cpp 101:5](asmjit/src/asmjit/base/constpool.cpp#L101)<br>
 错误信息: Pointer to local variable 'link' is stored ...<br>
 代码:
 ```
@@ -109,10 +109,10 @@ LabelLink* CodeHolder::newLabelLink(LabelEntry* le, uint32_t sectionId, size_t o
      ...
    }
 ```
-同样问题发生在[asmjit/src/asmjit/base/constpool.cpp 205:5](asmjit/src/asmjit/base/constpool.cpp)<br>
-1.6 [asmjit/src/asmjit/base/regalloc.cpp 201:3](asmjit/src/asmjit/base/regalloc.cpp)<br>
+同样问题发生在[asmjit/src/asmjit/base/constpool.cpp 205:5](asmjit/src/asmjit/base/constpool.cpp#L205)<br>
+1.6 [asmjit/src/asmjit/base/regalloc.cpp 201:3](asmjit/src/asmjit/base/regalloc.cpp#L201)<br>
 错误信息: Pointer to local variable 'cell' is stored ...<br>
-1.7 [string.cpp 70](asmjit/src/asmjit/base/string.cpp)<br>
+1.7 [asmjit/src/asmjit/base/string.cpp 70](asmjit/src/asmjit/base/string.cpp#L70)<br>
 错误信息: Pointer to local variable 'newData' is stored ...<br>
 ```
  if (_capacity < len) {
@@ -138,11 +138,11 @@ LabelLink* CodeHolder::newLabelLink(LabelEntry* le, uint32_t sectionId, size_t o
      return _data;
 ```
 同样问题发生在115行，146行
-发生在其他文件[asmjit/src/asmjit/base/zone.cpp 154](asmjit/src/asmjit/base/zone.cpp)
+发生在其他文件[asmjit/src/asmjit/base/zone.cpp 154](asmjit/src/asmjit/base/zone.cpp#L154)
 493行， 789行， 错误信息: Pointer to local variable 'newData' is stored ...<br>
-发生在其他文件[asmjit/src/asmjit/base/zone.cpp 493](asmjit/src/asmjit/base/zone.cpp)
+发生在其他文件[asmjit/src/asmjit/base/zone.cpp 493](asmjit/src/asmjit/base/zone.cpp#L493)
 错误信息: Pointer to local variable 'newData' is stored ...<br>
-1.8 [vmem.cpp 292](asmjit/src/asmjit/base/vmem.cpp)<br>
+1.8 [asmjit/src/asmjit/base/vmem.cpp 292](asmjit/src/asmjit/base/vmem.cpp#L292)<br>
 错误信息: Pointer to local variable 'vmem' is stored ...<br>
 ```
 static MemNode* vMemMgrCreateNode(VMemMgr* self, size_t size, size_t density) noexcept {
@@ -159,10 +159,10 @@ static MemNode* vMemMgrCreateNode(VMemMgr* self, size_t size, size_t density) no
    return node;
 }
 ```
-1.9 [asmjit/src/asmjit/x86/x86regalloc.cpp 1187](asmjit/src/asmjit/x86/x86regalloc.cpp)
+1.9 [asmjit/src/asmjit/x86/x86regalloc.cpp 1187](asmjit/src/asmjit/x86/x86regalloc.cpp#L1187)
 错误信息: Pointer to local variable 'cReg' is stored ...<br>
 同样问题发生在1188行，146行
-2.0 [asmjit/src/asmjit/base/zone.cpp 662](asmjit/src/asmjit/base/zone.cpp)<br>
+2.0 [asmjit/src/asmjit/base/zone.cpp 662](asmjit/src/asmjit/base/zone.cpp#L662)<br>
 错误信息: Pointer to local variable 'block' is stored ...<br>
 ```
  if (heap) {
@@ -181,7 +181,7 @@ static MemNode* vMemMgrCreateNode(VMemMgr* self, size_t size, size_t density) no
    }
 ```
 同样问题663行，688, 689
-2.1 [asmjit/src/asmjit/x86/x86regalloc.cpp 3749](asmjit/src/asmjit/x86/x86regalloc.cpp) <br>
+2.1 [asmjit/src/asmjit/x86/x86regalloc.cpp 3749](asmjit/src/asmjit/x86/x86regalloc.cpp#L3749) <br>
 错误信息: Pointer to local variable 'injectLabel' is stored ...<br>
 代码:
 ```
@@ -201,17 +201,17 @@ static MemNode* vMemMgrCreateNode(VMemMgr* self, size_t size, size_t density) no
  }
 ```
 
-2.2 [asmjit/src/asmjit/x86/x86regalloc.cpp 3986](asmjit/src/asmjit/x86/x86regalloc.cpp)  variable 'savedState' <br>
+2.2 [asmjit/src/asmjit/x86/x86regalloc.cpp 3986](asmjit/src/asmjit/x86/x86regalloc.cpp#L3986)  variable 'savedState' <br>
 同样3995行<br>
 ### k407(OperationLogicNotCorrespondWithItsFormat)
-1.1 [asmjit/src/asmjit/base/codeholder.cpp 435](asmjit/src/asmjit/base/codeholder.cpp)<br>
+1.1 [asmjit/src/asmjit/base/codeholder.cpp 435](asmjit/src/asmjit/base/codeholder.cpp#L435)<br>
 ```
    if (ASMJIT_UNLIKELY(!le))
      return DebugUtils::errored(kErrorNoHeapMemory);;
 ```
-同样问题 [asmjit/src/asmjit/base/string.cpp 287](asmjit/src/asmjit/base/string.cpp)<br>
+同样问题 [asmjit/src/asmjit/base/string.cpp 287](asmjit/src/asmjit/base/string.cpp#L287)<br>
 ### k409(AssignSameVariableTwiceSuccessively)
-1.1 [asmjit/src/asmjit/base/constpool.cpp 116](asmjit/src/asmjit/base/constpool.cpp)<br>
+1.1 [asmjit/src/asmjit/base/constpool.cpp 116](asmjit/src/asmjit/base/constpool.cpp#L116)<br>
 错误: The 'node' object is assigned values twice successively. Perhaps this is a mistake.<br>
 代码:
 ```
@@ -219,7 +219,7 @@ static MemNode* vMemMgrCreateNode(VMemMgr* self, size_t size, size_t density) no
      node = ConstPoolTree_splitNode(node);
 ```
 ### k410(SameReturnValueOfConditionalOperator)
-1.1 [asmjit/src/asmjit/x86/x86assembler.cpp 253](asmjit/src/asmjit/x86/x86assembler.cpp)<br>
+1.1 [asmjit/src/asmjit/x86/x86assembler.cpp 253](asmjit/src/asmjit/x86/x86assembler.cpp#L253)<br>
 错误信息:the conditional operation '(LL==1) ? 0 : 0' always returns the same value '0'.<br>
 代码:
 ```
@@ -229,14 +229,14 @@ static MemNode* vMemMgrCreateNode(VMemMgr* self, size_t size, size_t density) no
                TT == X86Inst::kOpCode_CDTT_DUP  ? ((LL==0) ? 0 : (LL==1) ? 2   : 3  ) : 0 ) << X86Inst::kOpCode_CDSHL_Shift
 ```
 ### k413(PointerUnaryAndDerefConfuse)
-1.1 [asmjit/src/asmjit/base/vmem.cpp 85](asmjit/src/asmjit/base/vmem.cpp)<br>
+1.1 [asmjit/src/asmjit/base/vmem.cpp 85](asmjit/src/asmjit/base/vmem.cpp#L85)<br>
 ```
  while (i < blocks) {
        ubits = *up++;
        ...
  }
 ```
-1.2 [asmjit/src/asmjit/x86/x86assembler.cpp 4584](asmjit/src/asmjit/x86/x86assembler.cpp)<br>
+1.2 [asmjit/src/asmjit/x86/x86assembler.cpp 4584](asmjit/src/asmjit/x86/x86assembler.cpp#L4584)<br>
 ```
          do {
              EMIT_BYTE(*src++);
@@ -244,6 +244,7 @@ static MemNode* vMemMgrCreateNode(VMemMgr* self, size_t size, size_t density) no
 
 ```
 ### 415(ContinueWillTerminateDoWhileFalseLoop)
+1.1 [asmjit/src/asmjit/base/regalloc.cpp 87:12](asmjit/src/asmjit/base/regalloc.cpp#L87)
 错误：false condition
 ```
    do {
@@ -251,7 +252,7 @@ static MemNode* vMemMgrCreateNode(VMemMgr* self, size_t size, size_t density) no
    } while (false);
 ```
 ### k416(UnconditionalBreakWithinALoop)
-1.1 [asmjit/src/asmjit/x86/x86regalloc.cpp 3265](asmjit/src/asmjit/x86/x86regalloc.cpp)<br>
+1.1 [asmjit/src/asmjit/x86/x86regalloc.cpp 3265](asmjit/src/asmjit/x86/x86regalloc.cpp#L3265)<br>
 错误信息: An unconditional 'continue' within a loop.
 ```
  for (i = 0; i < tiedCount; i++) {

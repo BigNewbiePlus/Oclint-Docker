@@ -13,9 +13,9 @@ CheckedError Parser::AddField(StructDef &struct_def, const std::string &name,
    return NoError();
  }
 ```
-1.2 [flatbuffers/src/idl_parser.cpp 1517:3 ](flatbuffers/src/idl_parser.cpp) <br>
+1.2 [flatbuffers/src/idl_parser.cpp 1517:3 ](flatbuffers/src/idl_parser.cpp#L1517) <br>
 错误信息: Pointer to local variable 'struct_def' is stored outside ...<br>
-1.3 [flatbuffers/src/idl_parser.cpp 2203:3 ](flatbuffers/src/idl_parser.cpp)<br>
+1.3 [flatbuffers/src/idl_parser.cpp 2203:3 ](flatbuffers/src/idl_parser.cpp#L2203)<br>
 错误信息: Pointer to local variable 'current_directory' is stored ...<br>
 ```
  CheckedError Parser::DoParse(const char *source,
@@ -30,7 +30,7 @@ CheckedError Parser::AddField(StructDef &struct_def, const std::string &name,
    ...
  }
  ```
-1.4 [flatbuffers/src/flatc_main.cpp 107:3](flatbuffers/src/flatc_main.cpp)<br>
+1.4 [flatbuffers/src/flatc_main.cpp 107:3](flatbuffers/src/flatc_main.cpp#L107)<br>
 错误信息: Pointer to local variable 'generators' is stored outside the scope...<br>
 ```
 int main(int argc, const char *argv[]) {
@@ -56,15 +56,15 @@ int main(int argc, const char *argv[]) {
  }
 ```
 ### k413(PointerUnaryAndDerefConfuse)
-1.1 [flatbuffers/src/idl_parser.cpp 247](flatbuffers/src/idl_parser.cpp) <br>
+1.1 [flatbuffers/src/idl_parser.cpp 247](flatbuffers/src/idl_parser.cpp#L247) <br>
 错误信息: Consider inspecting the statement of '*pointer++' pattern. Probably meant: '(*pointer)++'.<br>
 代码:
 ```
 char c = *cursor_++;
 ```
-1.2 [flatbuffers/src/idl_parser.cpp 327](flatbuffers/src/idl_parser.cpp) <br>
+1.2 [flatbuffers/src/idl_parser.cpp 327](flatbuffers/src/idl_parser.cpp#L327) <br>
 ### k417(RecuringCheck)
-1.1 [flatbuffers/src/idl_gen_general.cpp 810](flatbuffers/src/idl_gen_general.cpp)<br>
+1.1 [flatbuffers/src/idl_gen_general.cpp 810](flatbuffers/src/idl_gen_general.cpp#L810)<br>
 信息: Recurring check. The IF Condition 'lang\_.language == IDLOptions::kCSharp' check twice.<br>
 代码:
 ```
