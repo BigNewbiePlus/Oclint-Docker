@@ -4,21 +4,23 @@ msgpack-c统计信息
 main函数没有返回值<br>
 ### k405(InvalidPointToLocalVariable)
 1.1 [msgpack-c/src/unpack.c 496](msgpack-c/src/unpack.c#L496)<br>
-错误信息: Pointer to local variable 'nvec' is stored outside the scope of this variable. Such a pointer will become invalid.<br>
+错误信息: Pointer to local variable 'r' is stored outside the scope of this variable. Such a pointer will become invalid.<br>
 代码：
 ```
- int msgpack_vrefbuffer_append_ref(msgpack_vrefbuffer* vbuf,
-         const char* buf, size_t len)
+ msgpack_zone* msgpack_unpacker_release_zone(msgpack_unpacker* mpac)
  {
-     if(vbuf->tail == vbuf->end) {
-         ...
-         struct iovec* nvec = (struct iovec*)realloc(
-                 vbuf->array, sizeof(struct iovec)*nnext);
-         ...
-         vbuf->array = nvec;
-        ...
-     }
+     msgpack_zone* r;
      ...
+     r = msgpack_zone_new(MSGPACK_ZONE_CHUNK_SIZE);
+     if(r == NULL) {
+         return NULL;
+     }
+
+     ...
+     mpac->z = r;
+     CTX_CAST(mpac->ctx)->user.z = mpac->z;
+
+     return old;
  }
 ```
 同样出现在[msgpack-c/src/vrefbuffer.c 113](msgpack-c/src/vrefbuffer.c#L113) 信息: Pointer to local variable 'nvec' is stored outside ...<br>

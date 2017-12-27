@@ -109,7 +109,7 @@ LabelLink* CodeHolder::newLabelLink(LabelEntry* le, uint32_t sectionId, size_t o
      ...
    }
 ```
-同样问题发生在[asmjit/src/asmjit/base/constpool.cpp 205:5](asmjit/src/asmjit/base/constpool.cpp#L205)<br>
+同样问题发生在[asmjit/src/asmjit/base/constpool.cpp 205:5](asmjit/src/asmjit/base/constpool.cpp#L205) Pointer to local variable 'gap' is stored ...<br>
 1.6 [asmjit/src/asmjit/base/regalloc.cpp 201:3](asmjit/src/asmjit/base/regalloc.cpp#L201)<br>
 错误信息: Pointer to local variable 'cell' is stored ...<br>
 1.7 [asmjit/src/asmjit/base/string.cpp 70](asmjit/src/asmjit/base/string.cpp#L70)<br>
@@ -137,11 +137,9 @@ LabelLink* CodeHolder::newLabelLink(LabelEntry* le, uint32_t sectionId, size_t o
      ASMJIT_ASSERT(_length <= _capacity);
      return _data;
 ```
-同样问题发生在115行，146行
+同样问题发生在[115](asmjit/src/asmjit/base/string.cpp#L115)行，[146](asmjit/src/asmjit/base/string.cpp#L146)行
 发生在其他文件[asmjit/src/asmjit/base/zone.cpp 154](asmjit/src/asmjit/base/zone.cpp#L154)
-493行， 789行， 错误信息: Pointer to local variable 'newData' is stored ...<br>
-发生在其他文件[asmjit/src/asmjit/base/zone.cpp 493](asmjit/src/asmjit/base/zone.cpp#L493)
-错误信息: Pointer to local variable 'newData' is stored ...<br>
+，[493](asmjit/src/asmjit/base/zone.cpp#L493)行，[789](asmjit/src/asmjit/base/zone.cpp#L789)行， 错误信息: Pointer to local variable 'newData' is stored ...<br>
 1.8 [asmjit/src/asmjit/base/vmem.cpp 292](asmjit/src/asmjit/base/vmem.cpp#L292)<br>
 错误信息: Pointer to local variable 'vmem' is stored ...<br>
 ```
@@ -159,9 +157,9 @@ static MemNode* vMemMgrCreateNode(VMemMgr* self, size_t size, size_t density) no
    return node;
 }
 ```
-1.9 [asmjit/src/asmjit/x86/x86regalloc.cpp 1187](asmjit/src/asmjit/x86/x86regalloc.cpp#L1187)
+1.9 [asmjit/src/asmjit/x86/x86regalloc.cpp 1187](asmjit/src/asmjit/x86/x86regalloc.cpp#L1187)<br>
 错误信息: Pointer to local variable 'cReg' is stored ...<br>
-同样问题发生在1188行，146行
+同样问题发生在[1188](asmjit/src/asmjit/x86/x86regalloc.cpp#L1188)行<br>
 2.0 [asmjit/src/asmjit/base/zone.cpp 662](asmjit/src/asmjit/base/zone.cpp#L662)<br>
 错误信息: Pointer to local variable 'block' is stored ...<br>
 ```
@@ -180,7 +178,7 @@ static MemNode* vMemMgrCreateNode(VMemMgr* self, size_t size, size_t density) no
      _block[kSideRight] = block;
    }
 ```
-同样问题663行，688, 689
+同样问题[663](asmjit/src/asmjit/base/zone.cpp#L663)行，[688](asmjit/src/asmjit/base/zone.cpp#L688), [689](asmjit/src/asmjit/base/zone.cpp#L689)<br> 
 2.1 [asmjit/src/asmjit/x86/x86regalloc.cpp 3749](asmjit/src/asmjit/x86/x86regalloc.cpp#L3749) <br>
 错误信息: Pointer to local variable 'injectLabel' is stored ...<br>
 代码:
@@ -202,16 +200,16 @@ static MemNode* vMemMgrCreateNode(VMemMgr* self, size_t size, size_t density) no
 ```
 
 2.2 [asmjit/src/asmjit/x86/x86regalloc.cpp 3986](asmjit/src/asmjit/x86/x86regalloc.cpp#L3986)  variable 'savedState' <br>
-同样3995行<br>
+同样[3995](asmjit/src/asmjit/x86/x86regalloc.cpp#L3995)行<br>
 ### k407(OperationLogicNotCorrespondWithItsFormat)
-1.1 [asmjit/src/asmjit/base/codeholder.cpp 435](asmjit/src/asmjit/base/codeholder.cpp#L435)<br>
+1.1 [asmjit/src/asmjit/base/codeholder.cpp 435](asmjit/src/asmjit/base/codeholder.cpp#L435-L436)<br>
 ```
    if (ASMJIT_UNLIKELY(!le))
      return DebugUtils::errored(kErrorNoHeapMemory);;
 ```
-同样问题 [asmjit/src/asmjit/base/string.cpp 287](asmjit/src/asmjit/base/string.cpp#L287)<br>
+同样问题 [asmjit/src/asmjit/base/string.cpp 287](asmjit/src/asmjit/base/string.cpp#L287-L288)<br>
 ### k409(AssignSameVariableTwiceSuccessively)
-1.1 [asmjit/src/asmjit/base/constpool.cpp 116](asmjit/src/asmjit/base/constpool.cpp#L116)<br>
+1.1 [asmjit/src/asmjit/base/constpool.cpp 116](asmjit/src/asmjit/base/constpool.cpp#L115-L116)<br>
 错误: The 'node' object is assigned values twice successively. Perhaps this is a mistake.<br>
 代码:
 ```
@@ -229,7 +227,7 @@ static MemNode* vMemMgrCreateNode(VMemMgr* self, size_t size, size_t density) no
                TT == X86Inst::kOpCode_CDTT_DUP  ? ((LL==0) ? 0 : (LL==1) ? 2   : 3  ) : 0 ) << X86Inst::kOpCode_CDSHL_Shift
 ```
 ### k413(PointerUnaryAndDerefConfuse)
-1.1 [asmjit/src/asmjit/base/vmem.cpp 85](asmjit/src/asmjit/base/vmem.cpp#L85)<br>
+1.1 [asmjit/src/asmjit/base/vmem.cpp 604](asmjit/src/asmjit/base/vmem.cpp#L604)<br
 ```
  while (i < blocks) {
        ubits = *up++;

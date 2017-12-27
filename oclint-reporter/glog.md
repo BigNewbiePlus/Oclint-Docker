@@ -13,7 +13,7 @@ glog统计信息
  }
 ```
 ### k404(TwoFunctionBodyEquivalenit)
-1.1 [glog/src/symbolize_unittest.cc 92](glog/src/symbolize_unittest.cc#L92) <br>
+1.1 [glog/src/symbolize_unittest.cc 92](glog/src/symbolize_unittest.cc#L87-L95) <br>
 错误信息: It is odd that the body of 'nonstatic_func(line:87-90)' function is fully equivalent to the body of 'static_func(line:92-95)' function.<br>
 代码:
 ```
@@ -37,7 +37,7 @@ glog统计信息
 RAW_CHECK(1 == 1, "should be ok");
 ```
 ### k422(ConstantValueWithZeroPrefix)
-1.1 [glog/src/logging_unittest.cc 775](/glog/src/logging_unittest.cc#L775) <br>
+1.1 [glog/src/logging_unittest.cc 775](glog/src/logging_unittest.cc#L775) <br>
 信息：Be advised that the utilized constant value is represented by an octal form.
 代码
 ```

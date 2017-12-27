@@ -1,7 +1,7 @@
 pugixml统计信息
 =======================
 ### k404(TwoFunctionBodyEquivalenit)
-1.1 [pugixml/src/pugixml.cpp 12706](pugixml/src/pugixml.cpp#L12706) <br>
+1.1 [pugixml/src/pugixml.cpp 12706](pugixml/src/pugixml.cpp#L12706-#L12709) <br>
 错误信息: It is odd that the body of 'select_node(line:12685-12687)' function is fully equivalent to the body of 'select_single_node(line:12707-12709)' function.<br>
 代码:
 ```
@@ -32,7 +32,7 @@ PUGI__FN xml_parse_result xml_node::append_buffer(const void* contents, size_t s
          ...
      }
 ```
-1.2 [pugixml/src/pugixml.cpp 12306](pugixml/src/pugixml.cpp#L12306)]
+1.2 [pugixml/src/pugixml.cpp 12036](pugixml/src/pugixml.cpp#L12036)<br>
 信息: Pointer to local variable 'storage' is stored outside ...<br>
 ```
             xpath_node* storage = static_cast<xpath_node*>(impl::xml_memory::allocate(size_ * sizeof(xpath_node)));
@@ -40,9 +40,4 @@ PUGI__FN xml_parse_result xml_node::append_buffer(const void* contents, size_t s
              _begin = storage;
              ...
 ```
-错误信息: '1' repeated in expression '1==1' !<br>
-代码:
-```
-RAW_CHECK(1 == 1, "should be ok");
-```
-同样出现在行12243: ointer to local variable 'copy' is stored outside the scope...<br>
+同样出现在行[12243](pugixml/src/pugixml.cpp#L12243)行: Pointer to local variable 'copy' is stored outside the scope...<br>
