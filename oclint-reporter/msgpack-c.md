@@ -2,6 +2,7 @@ msgpack-c统计信息
 =======================
 ### k404(TwoFunctionBodyEquivalenit)
 错误信息: non-void function 'main' 函数没有返回值<br>
+[msgpack-c/example/cpp03/custom.cpp 34](msgpack-c/example/cpp03/custom.cpp#L34)
 代码:
 ```
  int main(void)
