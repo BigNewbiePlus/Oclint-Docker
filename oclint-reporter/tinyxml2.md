@@ -19,7 +19,7 @@ tinyxml2统计信息
  }
 ```
 ### k424(CmpFuncUseInCondition)
-1.1 [tinyxml2/xmltest.cpp 397](tinyxml2/xmltest.cpp#L397) <br>
+1.1 [tinyxml2/xmltest.cpp 700](tinyxml2/xmltest.cpp#L397) <br>
 错误信息: The 'strcmp' function returns 0 if corresponding strings are equal. Consider examining the condition for mistakes.<br>
 代码:
 ```
