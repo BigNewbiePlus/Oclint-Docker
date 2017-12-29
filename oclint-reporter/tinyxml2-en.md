@@ -20,8 +20,8 @@ sample code:
  }
 ```
 ### k424(CmpFuncUseInCondition)
-Explanation of k424: **strcmp function return 0 when two strings equal, check when using in condition.**
-1.1 [tinyxml2/xmltest.cpp 397](tinyxml2/xmltest.cpp#L397) <br>
+Explanation of k424: **strcmp function return 0 when two strings equal, check when using in condition.**<br>
+1.1 [tinyxml2/xmltest.cpp 700:10](tinyxml2/xmltest.cpp#L397) <br>
 error message: The 'strcmp' function returns 0 if corresponding strings are equal. Consider examining the condition for mistakes.<br>
 code sample:
 ```
