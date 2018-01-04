@@ -20,10 +20,23 @@ tinyxml2 defact information
  }
 ```
 ### k424(CmpFuncUseInCondition)
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> d5576d6eefa575ad7c3198692ce79682e75acad0
 **Explanation of k424:** strcmp function return 0 when two strings equal, check when using in condition.<br>
 1.1 [tinyxml2/xmltest.cpp 700](tinyxml2/xmltest.cpp#L700) <br>
 **error message:** The 'strcmp' function returns 0 if corresponding strings are equal. Consider examining the condition for mistakes.<br>
 **code sample:**
+<<<<<<< HEAD
+=======
+=======
+Explanation of k424: **strcmp function return 0 when two strings equal, check when using in condition.**<br>
+1.1 [tinyxml2/xmltest.cpp 700:10](tinyxml2/xmltest.cpp#L700) <br>
+error message: The 'strcmp' function returns 0 if corresponding strings are equal. Consider examining the condition for mistakes.<br>
+code sample:
+>>>>>>> 3bde67c021183104504c82167c91d2d3597eefe5
+>>>>>>> d5576d6eefa575ad7c3198692ce79682e75acad0
 ```
                 if ( strcmp( verifyBuf, savedBuf ) )
                 {
