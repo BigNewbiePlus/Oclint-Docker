@@ -1,10 +1,10 @@
 flatbuffer defact information
 =======================
 ### k405(InvalidPointToLocalVariable)
-Explanation of k405 : **a Pointer variable pointing to a local variable, when using the pointer out of the scope of local variable, The pointer will become Invalid.**<br>
+**Explanation of k405：** a Pointer variable pointing to a local variable, when using the pointer out of the scope of local variable, The pointer will become Invalid.<br>
 1.1 [flatbuffers/src/idl_parser.cpp 563:3 ](flatbuffers/src/idl_parser.cpp#L563)<br>
-error message: Pointer to local variable 'field' is stored outside the scope of this variable. Such a pointer will become invalid.<br>
-code sample:
+**error message:** Pointer to local variable 'field' is stored outside the scope of this variable. Such a pointer will become invalid.<br>
+**code sample:**
 ```
 CheckedError Parser::AddField(StructDef &struct_def, const std::string &name,
                                const Type &type, FieldDef **dest) {
@@ -15,9 +15,9 @@ CheckedError Parser::AddField(StructDef &struct_def, const std::string &name,
  }
 ```
 1.2 [flatbuffers/src/idl_parser.cpp 1517:3 ](flatbuffers/src/idl_parser.cpp#L1517) <br>
-error message: Pointer to local variable 'struct_def' is stored outside ...<br>
+**error message:** Pointer to local variable 'struct_def' is stored outside ...<br>
 1.3 [flatbuffers/src/idl_parser.cpp 2203:3 ](flatbuffers/src/idl_parser.cpp#L2203)<br>
-error message: Pointer to local variable 'current_directory' is stored ...<br>
+**error message:** Pointer to local variable 'current_directory' is stored ...<br>
 ```
  CheckedError Parser::DoParse(const char *source,
                                      const char **include_paths,
@@ -31,45 +31,20 @@ error message: Pointer to local variable 'current_directory' is stored ...<br>
    ...
  }
  ```
-1.4 [flatbuffers/src/flatc_main.cpp 107:3](flatbuffers/src/flatc_main.cpp#L107)<br>
-error message: Pointer to local variable 'generators' is stored outside the scope...<br>
-```
-int main(int argc, const char *argv[]) {
-   g_program_name = argv[0];
-
-   const flatbuffers::FlatCompiler::Generator generators[] = {
-     { flatbuffers::GenerateBinary,   "-b", "--binary", "binary", false,
-       nullptr,
-       flatbuffers::IDLOptions::kBinary,
-       "Generate wire format binaries for any data definitions",
-       flatbuffers::BinaryMakeRule },
-       ...
-       };
-
-   flatbuffers::FlatCompiler::InitParams params;
-   params.generators = generators;
-   params.num_generators = sizeof(generators) / sizeof(generators[0]);
-   params.warn_fn = Warn;
-   params.error_fn = Error;
-
-   flatbuffers::FlatCompiler flatc(params);
-   return flatc.Compile(argc - 1, argv + 1);
- }
-```
 ### k413(PointerUnaryAndDerefConfuse)
-Explanation of k413: **unary operator(++,--) and dereference of a pointer occur at the same time.The priority is unclear.**<br>
+**Explanation of k413:** unary operator(++,--) and dereference of a pointer occur at the same time.The priority is unclear.<br>
 1.1 [flatbuffers/src/idl_parser.cpp 247](flatbuffers/src/idl_parser.cpp#L247) <br>
-error message: Consider inspecting the statement of '\*pointer++' pattern. Probably meant: '(\*pointer)++'.<br>
-code sample:
+**error message:** Consider inspecting the statement of '\*pointer++' pattern. Probably meant: '(\*pointer)++'.<br>
+**code sample:**
 ```
 char c = *cursor_++;
 ```
 1.2 [flatbuffers/src/idl_parser.cpp 327](flatbuffers/src/idl_parser.cpp#L327) <br>
 ### k417(RecuringCheck)
-Explanation of k417: **Recurring check of condtion.**<br>
+**Explanation of k417:** Recurring check of condtion.<br>
 1.1 [flatbuffers/src/idl_gen_general.cpp 810](flatbuffers/src/idl_gen_general.cpp#L810)<br>
-error message: Recurring check. The IF Condition 'lang\_.language == IDLOptions::kCSharp' check twice.<br>
-code sample:
+**error message:** Recurring check. The IF Condition 'lang\_.language == IDLOptions::kCSharp' check twice.<br>
+**code sample:**
 ```
 if (lang_.language == IDLOptions::kCSharp) {
      code += " : IFlatbufferObject";
