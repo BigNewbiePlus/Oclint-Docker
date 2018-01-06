@@ -142,7 +142,7 @@ public:
             if(var.size() && hasNoVarInBody(body, var)){
                 string message = "The condition of loop is always true.";
                 addViolation(ws, this, message);
-            }
+           }
         }
         return true;
     }
